@@ -98,7 +98,7 @@
                     const isInvalid = !jogo.video || jogo.video === "video" || jogo.video === "audio";
                     const botaoHtml = !isInvalid 
                         ? `<button class="btn-play" onclick="abrirModal(${index})"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>` 
-                        : `<span class="status-aguardando">⌛</span>`;
+                        : `<span class="status-aguardando">🕒 Em espera</span>`;
 
                     div.innerHTML = `
                         <div class="info-jogo">
