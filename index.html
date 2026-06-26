@@ -65,19 +65,33 @@
 
     async function carregarDados() {
         try {
-            // Adicionado timestamp (?t=...) para evitar cache do navegador
             const response = await fetch('jogos.json?t=' + new Date().getTime());
             const data = await response.json();
-            const dataString = JSON.stringify(data);
+            
+            // --- Filtro: Remove jogos que passaram de 2h10min do horário de início ---
+            const agora = new Date();
+            const jogosFiltrados = data.filter(jogo => {
+                if (!jogo.horario) return true; 
+                
+                const [hora, min] = jogo.horario.split(':').map(Number);
+                const dataJogo = new Date();
+                dataJogo.setHours(hora, min, 0, 0);
+                
+                // Limite de 2 horas e 10 minutos (130 minutos)
+                const limite = new Date(dataJogo.getTime() + (130 * 60000));
+                return agora < limite;
+            });
+            // -------------------------------------------------------------------------
 
-            // Só atualiza o DOM se os dados no arquivo realmente mudaram
+            const dataString = JSON.stringify(jogosFiltrados);
+
             if (dataString !== cacheJson) {
                 cacheJson = dataString;
-                listaJogosGlobal = data; 
+                listaJogosGlobal = jogosFiltrados; 
                 const container = document.getElementById('listaJogos');
                 container.innerHTML = '';
                 
-                data.forEach((jogo, index) => {
+                jogosFiltrados.forEach((jogo, index) => {
                     const div = document.createElement('div');
                     div.className = 'jogo-item';
                     
@@ -130,12 +144,9 @@
     function abrirNovaAba() { if (indiceAtual !== null) window.open(listaJogosGlobal[indiceAtual].video, '_blank'); }
     function fecharModal() { document.getElementById('modal').style.display = 'none'; document.getElementById('modalContentContainer').innerHTML = ''; if (hls) { hls.destroy(); hls = null; } indiceAtual = null; }
 
-    // Carregamento inicial
     carregarDados();
 
-    // Verificação automática a cada 15 segundos
     setInterval(() => {
-        // Só recarrega a lista se o modal estiver fechado
         if (document.getElementById('modal').style.display !== 'flex') {
             carregarDados();
         }
