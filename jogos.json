@@ -1,12 +1,5 @@
 [
-    {
-        "horario": "10:08",
-        "confronto": "Qingdao Hainiu FC x Yunnan Yukun",
-        "esporte": "Futebol",
-        "empresa": "AKAMEID",
-        "video": "https://delicate-feather-5576.futebolsemdelay.workers.dev/?url=https%3A%2F%2F744133.akamaized.net%2Fhls%2Flive%2F716242%2Fch22%2F28b8a944bc85d79ef66d2e4d2f5ed510e6e22ab7%2Fvideo-m2_video%2Fhdntl%3Dexp%3D1782565932~acl%3D%252f*~id%3Db5a872652f7e4b2d9e23f89b8219acb7~data%3Dhdntl~hmac%3De61cfbab32fa131322d18990d73f585d13861445d1deb5ea8aa804ba3f7ebae8%2Fvideo.m3u8&token=BnZiVtAz-9cFa-Ncmukw0G4n8nOsyZi5SzMm45e24rPeFKt82Z2tcJhLAAoRoc-bXVVUlAUTMq8smqZtQuReUP3qJRARVcIIpohnnn8nD2s38rX3xPI6FrQCjhhluWrsoprz9Z0qMHtNHYocJRjI72_0BzvIUb1nSkYdqfqRM_8fWN95bipDjHGjQ2AdQ2695IhIdAcy0SzYiPVwPIYWzw6WNtZidzn-KwaPrWa_Yph2jtJB1SEYhDN4BX-jeCC_lY6Y0V73TCxBc4YmuW2_gPMKN8i5n0PR0XFxzJsmgIB506cV5U4o5w5MFXQ1NSKCyiOh3t6lVFk3tomfkj-ASw",
-        "audio": "https://delicate-feather-5576.futebolsemdelay.workers.dev/?url=https%3A%2F%2F744133.akamaized.net%2Fhls%2Flive%2F716242-b%2Fch22%2F28b8a944bc85d79ef66d2e4d2f5ed510e6e22ab7%2Faudio-very_low_audio-264%2Fhdntl%3Dexp%3D1782565932~acl%3D%252f*~id%3Db5a872652f7e4b2d9e23f89b8219acb7~data%3Dhdntl~hmac%3De61cfbab32fa131322d18990d73f585d13861445d1deb5ea8aa804ba3f7ebae8%2Faudio.m3u8&token=BnZiVtAz-9cFa-Ncmukw0G4n8nOsyZi5SzMm45e24rPeFKt82Z2tcJhLAAoRoc-bXVVUlAUTMq8smqZtQuReUP3qJRARVcIIpohnnn8nD2s38rX3xPI6FrQCjhhluWrsoprz9Z0qMHtNHYocJRjI72_0BzvIUb1nSkYdqfqRM_8fWN95bipDjHGjQ2AdQ2695IhIdAcy0SzYiPVwPIYWzw6WNtZidzn-KwaPrWa_Yph2jtJB1SEYhDN4BX-jeCC_lY6Y0V73TCxBc4YmuW2_gPMKN8i5n0PR0XFxzJsmgIB506cV5U4o5w5MFXQ1NSKCyiOh3t6lVFk3tomfkj-ASw"
-    },
+
     {
         "horario": "10:30",
         "confronto": "FK Jablonec x FC Sellier & Bellot Vlasim",
