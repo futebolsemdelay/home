@@ -14,5 +14,37 @@
         "empresa": "AKAMEID",
         "video": "https://delicate-feather-5576.futebolsemdelay.workers.dev/?url=https%3A%2F%2F744133.akamaized.net%2Fhls%2Flive%2F716265%2Fch35%2Ffaed6a76cc001b9542ef8aa8e9f97250acde4938%2Fvideo-m2_video%2Fhdntl%3Dexp%3D1782567106~acl%3D%252f*~id%3De0c5e0ed4efa4015a34b177fc53e1990~data%3Dhdntl~hmac%3Df4a05f5de81091446225f587b2914c560793e95c0052a0a04e3cd27fe1819c82%2Fvideo.m3u8&token=BnZiVtAz-9cFa-Ncmukw0G4n8nOsyZi5SzMm45e24rPeFKt82Z2tcJhLAAoRoc-bXVVUlAUTMq8smqZtQuReUP3qJRARVcIIpohnnn8nD2s38rX3xPI6FrQCjhhluWrsoprz9Z0qMHtNHYocJRjI72_0BzvIUb1nSkYdqfqRM_8fWN95bipDjHGjQ2AdQ2695IhIdAcy0SzYiPVwPIYWzw6WNtZidzn-KwaPrWa_Yph2jtJB1SEYhDN4BX-jeCC_lY6Y0V73TCxBc4YmuW2_gPMKN8i5n0PR0XFxzJsmgIB506cV5U4o5w5MFXQ1NSKCyiOh3t6lVFk3tomfkj-ASw",
         "audio": "https://delicate-feather-5576.futebolsemdelay.workers.dev/?url=https%3A%2F%2F744133.akamaized.net%2Fhls%2Flive%2F716265%2Fch35%2Ffaed6a76cc001b9542ef8aa8e9f97250acde4938%2Fvideo-m2_video%2Fhdntl%3Dexp%3D1782567106~acl%3D%252f*~id%3De0c5e0ed4efa4015a34b177fc53e1990~data%3Dhdntl~hmac%3Df4a05f5de81091446225f587b2914c560793e95c0052a0a04e3cd27fe1819c82%2Fvideo.m3u8&token=BnZiVtAz-9cFa-Ncmukw0G4n8nOsyZi5SzMm45e24rPeFKt82Z2tcJhLAAoRoc-bXVVUlAUTMq8smqZtQuReUP3qJRARVcIIpohnnn8nD2s38rX3xPI6FrQCjhhluWrsoprz9Z0qMHtNHYocJRjI72_0BzvIUb1nSkYdqfqRM_8fWN95bipDjHGjQ2AdQ2695IhIdAcy0SzYiPVwPIYWzw6WNtZidzn-KwaPrWa_Yph2jtJB1SEYhDN4BX-jeCC_lY6Y0V73TCxBc4YmuW2_gPMKN8i5n0PR0XFxzJsmgIB506cV5U4o5w5MFXQ1NSKCyiOh3t6lVFk3tomfkj-ASw"
+    },
+    {
+        "horario": "16:00",
+        "confronto": "Noruega x França",
+        "esporte": "Futebol",
+        "empresa": "AKAMEID",
+        "video": "video",
+        "audio": "video"
+    },
+    {
+        "horario": "16:00",
+        "confronto": "Senegal x Iraque",
+        "esporte": "Futebol",
+        "empresa": "AKAMEID",
+        "video": "video",
+        "audio": "audio"
+    },
+    {
+        "horario": "21:00",
+        "confronto": "Cabo Verde  x Arabia Saudita",
+        "esporte": "Futebol",
+        "empresa": "AKAMEID",
+        "video": "video",
+        "audio": "audio"
+    },
+    {
+        "horario": "21:00",
+        "confronto": "Uruguai x Espanha",
+        "esporte": "Futebol",
+        "empresa": "AKAMEID",
+        "video": "Video",
+        "audio": "audio"
     }
 ]
