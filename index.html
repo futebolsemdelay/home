@@ -56,47 +56,48 @@
 </div>
 
 <script>
-    // Função para retornar emojis coloridos
+    let hls, listaJogosGlobal = [], indiceAtual = null, cacheJson = "";
+
     function getEmoji(esporte) {
-        const emojis = {
-            'Futebol': '⚽',
-            'Tenis': '🎾',
-            'Basquete': '🏀',
-            'Snooker': '🎱'
-        };
+        const emojis = { 'Futebol': '⚽', 'Tenis': '🎾', 'Basquete': '🏀', 'Snooker': '🎱' };
         return emojis[esporte] || '📍';
     }
 
-    let hls, listaJogosGlobal = [], indiceAtual = null;
-
     async function carregarDados() {
         try {
-            const response = await fetch('jogos.json');
+            // Adicionado timestamp (?t=...) para evitar cache do navegador
+            const response = await fetch('jogos.json?t=' + new Date().getTime());
             const data = await response.json();
-            listaJogosGlobal = data; 
-            const container = document.getElementById('listaJogos');
-            container.innerHTML = '';
-            
-            data.forEach((jogo, index) => {
-                const div = document.createElement('div');
-                div.className = 'jogo-item';
-                
-                const isInvalid = !jogo.video || jogo.video === "video" || jogo.video === "audio";
-                const botaoHtml = !isInvalid 
-                    ? `<button class="btn-play" onclick="abrirModal(${index})"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>` 
-                    : `<span class="status-aguardando">Aguardando ìnicio</span>`;
+            const dataString = JSON.stringify(data);
 
-                div.innerHTML = `
-                    <div class="info-jogo">
-                        <span class="emoji-esporte">${getEmoji(jogo.esporte)}</span>
-                        <span class="horario">${jogo.horario || '--:--'}</span>
-                        <span class="confronto">${jogo.confronto}</span>
-                    </div>
-                    ${botaoHtml}`;
-                container.appendChild(div);
-            });
+            // Só atualiza o DOM se os dados no arquivo realmente mudaram
+            if (dataString !== cacheJson) {
+                cacheJson = dataString;
+                listaJogosGlobal = data; 
+                const container = document.getElementById('listaJogos');
+                container.innerHTML = '';
+                
+                data.forEach((jogo, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'jogo-item';
+                    
+                    const isInvalid = !jogo.video || jogo.video === "video" || jogo.video === "audio";
+                    const botaoHtml = !isInvalid 
+                        ? `<button class="btn-play" onclick="abrirModal(${index})"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>` 
+                        : `<span class="status-aguardando">Aguardando início</span>`;
+
+                    div.innerHTML = `
+                        <div class="info-jogo">
+                            <span class="emoji-esporte">${getEmoji(jogo.esporte)}</span>
+                            <span class="horario">${jogo.horario || '--:--'}</span>
+                            <span class="confronto">${jogo.confronto}</span>
+                        </div>
+                        ${botaoHtml}`;
+                    container.appendChild(div);
+                });
+            }
         } catch (err) {
-            document.getElementById('listaJogos').innerHTML = "Erro ao carregar dados.";
+            console.error("Erro ao carregar dados:", err);
         }
     }
 
@@ -129,7 +130,16 @@
     function abrirNovaAba() { if (indiceAtual !== null) window.open(listaJogosGlobal[indiceAtual].video, '_blank'); }
     function fecharModal() { document.getElementById('modal').style.display = 'none'; document.getElementById('modalContentContainer').innerHTML = ''; if (hls) { hls.destroy(); hls = null; } indiceAtual = null; }
 
+    // Carregamento inicial
     carregarDados();
+
+    // Verificação automática a cada 15 segundos
+    setInterval(() => {
+        // Só recarrega a lista se o modal estiver fechado
+        if (document.getElementById('modal').style.display !== 'flex') {
+            carregarDados();
+        }
+    }, 15000); 
 </script>
 </body>
 </html>
