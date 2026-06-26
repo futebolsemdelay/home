@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel de Gestão - Stream Arena</title>
+    <style>
+        :root { --primary: #2c3e50; }
+        body { font-family: sans-serif; padding: 20px; background: #f4f7f6; }
+        .card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 15px; }
+        input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { padding: 10px; border: none; border-radius: 4px; cursor: pointer; color: white; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; background: #fff; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        .blink-red { background: #ffcccc !important; animation: blink 1s infinite; }
+        .blink-blue { background: #cce5ff !important; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body>
+
+<h2>Painel de Gerenciamento</h2>
+
+<div class="card">
+    <input type="hidden" id="editIndex" value="-1">
+    <div class="form-grid">
+        <input type="text" id="horario" placeholder="Horário (ex: 20:00)">
+        <input type="text" id="confronto" placeholder="Confronto">
+        <select id="esporte">
+            <option value="Futebol">Futebol</option>
+            <option value="Basquete">Basquete</option>
+            <option value="Vôlei">Vôlei</option>
+            <option value="E-Sports">E-Sports</option>
+        </select>
+        <select id="empresa">
+            <option value="OUTRA">OUTRA</option>
+            <option value="AKAMEID">AKAMEID</option>
+        </select>
+        <input type="url" id="linkVideo" placeholder="Link Vídeo">
+        <input type="url" id="linkAudio" placeholder="Link Áudio">
+    </div>
+    <button style="background: #27ae60;" onclick="salvarDados()">Salvar Jogo</button>
+    <button style="background: #2980b9;" onclick="baixarJSON()">Baixar JSON</button>
+    <button style="background: #7f8c8d;" onclick="document.getElementById('uploadFile').click()">Upload JSON</button>
+    <input type="file" id="uploadFile" accept=".json" onchange="uploadJSON(event)" style="display:none">
+</div>
+
+<table>
+    <thead><tr><th>Horário</th><th>Confronto</th><th>Ações</th></tr></thead>
+    <tbody id="listaDados"></tbody>
+</table>
+
+<audio id="alertaSom" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+
+<script>
+    // Carrega e limpa dados (remove nulls)
+    let jogos = JSON.parse(localStorage.getItem('jogosStream')) || [];
+    jogos = jogos.filter(j => j !== null && typeof j === 'object');
+    localStorage.setItem('jogosStream', JSON.stringify(jogos));
+
+    function salvarDados() {
+        const novoJogo = {
+            horario: document.getElementById('horario').value,
+            confronto: document.getElementById('confronto').value,
+            esporte: document.getElementById('esporte').value,
+            empresa: document.getElementById('empresa').value,
+            video: document.getElementById('linkVideo').value,
+            audio: document.getElementById('linkAudio').value
+        };
+
+        const index = parseInt(document.getElementById('editIndex').value);
+        if (index > -1) jogos[index] = novoJogo;
+        else jogos.push(novoJogo);
+
+        localStorage.setItem('jogosStream', JSON.stringify(jogos));
+        renderizarTabela();
+        document.querySelectorAll('input:not([type="hidden"])').forEach(i => i.value = '');
+        document.getElementById('editIndex').value = -1;
+    }
+
+    function renderizarTabela() {
+        const tbody = document.getElementById('listaDados');
+        const agora = new Date();
+        const horaAtual = agora.getHours().toString().padStart(2, '0') + ":" + agora.getMinutes().toString().padStart(2, '0');
+        
+        tbody.innerHTML = jogos.map((j, i) => {
+            let classe = "";
+            let [h, m] = j.horario.split(':').map(Number);
+            
+            // Calculo de fim (h, m + 140 min = 2h20)
+            let dateFim = new Date(); dateFim.setHours(h, m + 140);
+            let horaFim = dateFim.getHours().toString().padStart(2, '0') + ":" + dateFim.getMinutes().toString().padStart(2, '0');
+            
+            if (j.horario === horaAtual) classe = "blink-red";
+            else if (horaFim === horaAtual) classe = "blink-blue";
+
+            return `<tr class="${classe}">
+                <td>${j.horario}</td>
+                <td>${j.confronto}</td>
+                <td>
+                    <button style="background:orange" onclick="editar(${i})">Editar</button>
+                    <button style="background:red" onclick="excluir(${i})">Excluir</button>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    function checarAlertas() {
+        const agora = new Date();
+        const horaAtual = agora.getHours().toString().padStart(2, '0') + ":" + agora.getMinutes().toString().padStart(2, '0');
+        
+        jogos.forEach(j => {
+            let [h, m] = j.horario.split(':').map(Number);
+            let dateFim = new Date(); dateFim.setHours(h, m + 140);
+            let horaFim = dateFim.getHours().toString().padStart(2, '0') + ":" + dateFim.getMinutes().toString().padStart(2, '0');
+
+            if (j.horario === horaAtual || horaFim === horaAtual) {
+                document.getElementById('alertaSom').play();
+            }
+        });
+        renderizarTabela();
+    }
+
+    function editar(i) {
+        const j = jogos[i];
+        document.getElementById('editIndex').value = i;
+        document.getElementById('horario').value = j.horario;
+        document.getElementById('confronto').value = j.confronto;
+        document.getElementById('esporte').value = j.esporte;
+        document.getElementById('empresa').value = j.empresa;
+        document.getElementById('linkVideo').value = j.video;
+        document.getElementById('linkAudio').value = j.audio;
+    }
+
+    function excluir(i) {
+        if(confirm('Tem certeza?')) {
+            jogos.splice(i, 1);
+            localStorage.setItem('jogosStream', JSON.stringify(jogos));
+            renderizarTabela();
+        }
+    }
+
+    function baixarJSON() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jogos, null, 4));
+        const a = document.createElement('a'); a.href = dataStr; a.download = 'jogos.json'; a.click();
+    }
+
+    function uploadJSON(e) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            jogos = JSON.parse(event.target.result).filter(j => j !== null);
+            localStorage.setItem('jogosStream', JSON.stringify(jogos));
+            renderizarTabela();
+        };
+        reader.readAsText(e.target.files[0]);
+    }
+
+    setInterval(checarAlertas, 30000);
+    renderizarTabela();
+</script>
+</body>
+</html>

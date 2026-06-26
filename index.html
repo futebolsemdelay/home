@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stream Arena</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        :root { --bg: #0f0f13; --accent: #7289da; --card: #1a1a20; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; padding: 20px; }
+        
+        .lista-jogos { max-width: 800px; margin: 0 auto; }
+        .jogo-item { 
+            background: var(--card); padding: 12px 15px; border-radius: 12px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center; 
+            border: 1px solid #333;
+        }
+        
+        .info-jogo { display: flex; align-items: center; gap: 10px; overflow: hidden; }
+        .emoji-esporte { font-size: 20px; min-width: 25px; }
+        .horario { color: #888; font-size: 0.85em; font-weight: bold; min-width: 45px; }
+        .confronto { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+
+        .btn-play { 
+            background: var(--accent); border: none; width: 40px; height: 40px; 
+            border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .btn-play svg { width: 20px; height: 20px; fill: white; margin-left: 3px; }
+        .status-aguardando { color: #555; font-size: 12px; font-weight: bold; }
+
+        #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: #111; padding: 20px; border-radius: 20px; width: 95%; max-width: 650px; text-align: center; }
+        #modalContentContainer { width: 100%; min-height: 300px; background: black; border-radius: 12px; overflow: hidden; margin-bottom: 15px; }
+        
+        .botoes-container { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+        .btn-modal { display: inline-flex; align-items: center; gap: 6px; background: #333; color: white; border: none; padding: 10px 15px; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="lista-jogos">
+    <h1>Transmissões</h1>
+    <div id="listaJogos">Carregando eventos...</div>
+</div>
+
+<div id="modal">
+    <div class="modal-content">
+        <h2 id="modalTitle" style="color:var(--accent)"></h2>
+        <div id="modalContentContainer"></div>
+        <div class="botoes-container">
+            <button class="btn-modal" onclick="fecharModal()">← Voltar</button>
+            <button class="btn-modal" style="background:#7289da" onclick="recarregarVideo()">↻ Atualizar</button>
+            <button class="btn-modal" style="background:#27ae60" onclick="abrirNovaAba()">⤡ Externo</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Função para retornar emojis coloridos
+    function getEmoji(esporte) {
+        const emojis = {
+            'Futebol': '⚽',
+            'Tenis': '🎾',
+            'Basquete': '🏀',
+            'Snooker': '🎱'
+        };
+        return emojis[esporte] || '📍';
+    }
+
+    let hls, listaJogosGlobal = [], indiceAtual = null;
+
+    async function carregarDados() {
+        try {
+            const response = await fetch('jogos.json');
+            const data = await response.json();
+            listaJogosGlobal = data; 
+            const container = document.getElementById('listaJogos');
+            container.innerHTML = '';
+            
+            data.forEach((jogo, index) => {
+                const div = document.createElement('div');
+                div.className = 'jogo-item';
+                
+                const isInvalid = !jogo.video || jogo.video === "video" || jogo.video === "audio";
+                const botaoHtml = !isInvalid 
+                    ? `<button class="btn-play" onclick="abrirModal(${index})"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>` 
+                    : `<span class="status-aguardando">Aguardando ìnicio</span>`;
+
+                div.innerHTML = `
+                    <div class="info-jogo">
+                        <span class="emoji-esporte">${getEmoji(jogo.esporte)}</span>
+                        <span class="horario">${jogo.horario || '--:--'}</span>
+                        <span class="confronto">${jogo.confronto}</span>
+                    </div>
+                    ${botaoHtml}`;
+                container.appendChild(div);
+            });
+        } catch (err) {
+            document.getElementById('listaJogos').innerHTML = "Erro ao carregar dados.";
+        }
+    }
+
+    function abrirModal(index) {
+        indiceAtual = index;
+        const jogo = listaJogosGlobal[index];
+        const container = document.getElementById('modalContentContainer');
+        document.getElementById('modal').style.display = 'flex';
+        document.getElementById('modalTitle').innerText = jogo.confronto;
+        container.innerHTML = '';
+        if (hls) { hls.destroy(); hls = null; }
+        
+        if (jogo.empresa === 'AKAMEID') {
+            container.innerHTML = `<video id="playerVideo" controls autoplay playsinline style="width:100%; height:100%"></video>`;
+            const video = document.getElementById('playerVideo');
+            hls = new Hls(); hls.loadSource(jogo.video); hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+            if (jogo.audio) {
+                const audio = document.createElement('audio'); audio.src = jogo.audio; audio.style.display = 'none';
+                container.appendChild(audio);
+                video.onplay = () => audio.play(); video.onpause = () => audio.pause();
+                video.onseeking = () => audio.currentTime = video.currentTime;
+            }
+        } else {
+            container.innerHTML = `<iframe src="${jogo.video}" style="width:100%; height:400px; border:none;"></iframe>`;
+        }
+    }
+
+    function recarregarVideo() { if (indiceAtual !== null) abrirModal(indiceAtual); }
+    function abrirNovaAba() { if (indiceAtual !== null) window.open(listaJogosGlobal[indiceAtual].video, '_blank'); }
+    function fecharModal() { document.getElementById('modal').style.display = 'none'; document.getElementById('modalContentContainer').innerHTML = ''; if (hls) { hls.destroy(); hls = null; } indiceAtual = null; }
+
+    carregarDados();
+</script>
+</body>
+</html>
