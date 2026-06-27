@@ -152,7 +152,8 @@
 
     function getEmoji(esporte) {
         const emojis = { 'Futebol': '⚽', 'Tenis': '🎾', 'Basquete': '🏀', 'Snooker': '🎱' };
-        return emojis[esporte] || '📍';
+        // Retorna o emoji específico ou o símbolo 🔴 (Ao Vivo) caso não seja especificado
+        return emojis[esporte] || '🔴';
     }
 
     async function carregarDados() {
@@ -209,7 +210,8 @@
         container.innerHTML = '';
         if (hls) { hls.destroy(); hls = null; }
         
-        if (jogo.empresa === 'AKAMEID') {
+        // Adicionada a regra para CLOUDFRONT junto com a AKAMEID
+        if (jogo.empresa === 'AKAMEID' || jogo.empresa === 'CLOUDFRONT') {
             container.innerHTML = `<video id="playerVideo" controls autoplay playsinline style="width:100%; height:100%"></video>`;
             const video = document.getElementById('playerVideo');
             hls = new Hls(); hls.loadSource(jogo.video); hls.attachMedia(video);
