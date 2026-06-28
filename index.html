@@ -86,7 +86,7 @@
     <main>
         <div id="player-container" ondblclick="toggleFullScreen()">
             <div id="player"></div>
-            <button id="btn-reload" onclick="reloadCurrentChannel(event)">🔄 Tentar Novamente</button>
+            <button id="btn-reload" onclick="reloadCurrentChannel(event)">🔄 Erro ? Tentar Novamente</button>
         </div>
     </main>
     <script>
@@ -200,7 +200,7 @@
             // Limpa qualquer timer anterior para não conflitar
             clearTimeout(reloadTimeout);
 
-            // Define o timer para esconder o botão após 3 segundos (3000 ms)
+            // Define o timer para esconder o botão após 5 segundos (3000 ms)
             reloadTimeout = setTimeout(() => {
                 btn.style.opacity = '0';
                 // Aguarda a transição de opacidade (0.5s) terminar antes de dar display:none
