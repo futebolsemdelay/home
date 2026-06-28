@@ -26,7 +26,6 @@
         .search-box { padding: 15px; }
         .search-box input { width: 90%; background: #000; border: 1px solid #333; padding: 12px; color: var(--green); border-radius: 8px; outline: none; font-family: 'Rajdhani'; }
         
-        /* Adicionado padding-bottom para corrigir o corte no mobile */
         .channel-list { overflow-y: auto; flex-grow: 1; padding-bottom: 80px; }
         
         .item { padding: 12px 15px; margin: 5px 10px; background: #1a1a1a; border-radius: 8px; display: flex; align-items: center; font-size: 16px; font-weight: 600; cursor: pointer; border-left: 4px solid transparent; user-select: none; transition: 0.2s; }
@@ -46,7 +45,6 @@
 
         .channel-number { min-width: 30px; font-size: 11px; color: var(--purple); margin-right: 12px; background: #000; padding: 2px 6px; border-radius: 4px; text-align: center; }
         
-        /* Estilo do Botão de Recarregar */
         #btn-reload {
             position: absolute;
             top: 15px;
@@ -63,7 +61,7 @@
             z-index: 1000;
             box-shadow: 0 4px 10px rgba(0,0,0,0.8);
             transition: opacity 0.3s ease, transform 0.2s;
-            display: none; /* Escondido por padrão */
+            display: none;
             opacity: 0;
         }
         #btn-reload:hover { background: var(--green); color: #000; transform: scale(1.05); }
@@ -86,15 +84,14 @@
     <main>
         <div id="player-container" ondblclick="toggleFullScreen()">
             <div id="player"></div>
-            <button id="btn-reload" onclick="reloadCurrentChannel(event)">🔄 Erro ? Tentar Novamente</button>
+            <button id="btn-reload" onclick="reloadCurrentChannel(event)">🔄 Tentar Novamente</button>
         </div>
     </main>
     <script>
         let currentClappr;
         let canaisRaw = []; 
-        let reloadTimeout; // Variável para controlar o timer do botão
+        let reloadTimeout; 
         
-        // Armazena os dados do canal atual para recarregar
         let canalAtualData = null; 
         let canalAtualElemento = null;
 
@@ -163,14 +160,12 @@
         }
 
         function playCanal(c, el){
-            // Salva as informações do canal atual para o botão "Recarregar"
             canalAtualData = c;
             canalAtualElemento = el;
 
             updateActive(el);
             clearPlayer();
             
-            // Chama a função para exibir o botão temporariamente
             mostrarBotaoRecarregar();
 
             const p = document.getElementById('player');
@@ -183,7 +178,17 @@
                     plugins: [HlsjsPlayback],
                     width: '100%',
                     height: '100%',
-                    autoPlay: true
+                    autoPlay: true,
+                    playback: {
+                        hlsjsConfig: {
+                            // Sistema Anti-Trava (Buffer e Delay)
+                            maxBufferLength: 30,       
+                            maxMaxBufferLength: 60,    
+                            liveSyncDurationCount: 3,  
+                            lowLatencyMode: false,     
+                            enableWorker: true         
+                        }
+                    }
                 });
             } else if (urlVideo) {
                 p.innerHTML = `<div class="player-wrapper"><div class="click-shield" onclick="this.remove()"></div><iframe src="${urlVideo}" allow="autoplay;fullscreen"></iframe></div>`;
@@ -193,23 +198,19 @@
         function mostrarBotaoRecarregar() {
             const btn = document.getElementById('btn-reload');
             
-            // Mostra o botão e define opacidade total
             btn.style.display = 'block';
-            setTimeout(() => btn.style.opacity = '1', 10); // pequeno delay para a transição CSS funcionar
+            setTimeout(() => btn.style.opacity = '1', 10); 
 
-            // Limpa qualquer timer anterior para não conflitar
             clearTimeout(reloadTimeout);
 
-            // Define o timer para esconder o botão após 5 segundos (3000 ms)
             reloadTimeout = setTimeout(() => {
                 btn.style.opacity = '0';
-                // Aguarda a transição de opacidade (0.5s) terminar antes de dar display:none
-                setTimeout(() => btn.style.display = 'none', 500); 
+                setTimeout(() => btn.style.display = 'none', 300); 
             }, 3000);
         }
 
         function reloadCurrentChannel(event) {
-            event.stopPropagation(); // Evita conflito caso clique duplo tente dar fullscreen
+            event.stopPropagation(); 
             if (canalAtualData && canalAtualElemento) {
                 playCanal(canalAtualData, canalAtualElemento);
             }
