@@ -25,46 +25,29 @@
         
         .search-box { padding: 15px; }
         .search-box input { width: 90%; background: #000; border: 1px solid #333; padding: 12px; color: var(--green); border-radius: 8px; outline: none; font-family: 'Rajdhani'; }
-        
-        .channel-list { overflow-y: auto; flex-grow: 1; padding-bottom: 80px; }
-        
+        .channel-list { overflow-y: auto; flex-grow: 1; }
         .item { padding: 12px 15px; margin: 5px 10px; background: #1a1a1a; border-radius: 8px; display: flex; align-items: center; font-size: 16px; font-weight: 600; cursor: pointer; border-left: 4px solid transparent; user-select: none; transition: 0.2s; }
         .item:hover { background: #222; transform: translateX(5px); }
         .item.active { border-left-color: var(--green); background: rgba(138,43,226,0.15); color: var(--green); }
-        
-        .item.offline { 
-            background: rgba(255, 0, 0, 0.15); 
-            border-left-color: #ff3333; 
-            color: #ff9999; 
-            opacity: 0.8;
-        }
-        .item.offline .channel-number {
-            background: #4a0000;
-            color: #ff3333;
-        }
-
         .channel-number { min-width: 30px; font-size: 11px; color: var(--purple); margin-right: 12px; background: #000; padding: 2px 6px; border-radius: 4px; text-align: center; }
         
-        #btn-reload {
+        /* Estilo da Caixinha do Monitor de Buffer */
+        #buffer-monitor {
             position: absolute;
             top: 15px;
-            right: 15px;
-            background: var(--purple);
-            color: #fff;
-            border: none;
-            padding: 8px 16px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            color: var(--green);
+            padding: 8px 12px;
             border-radius: 6px;
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 700;
             font-size: 14px;
-            cursor: pointer;
+            font-weight: bold;
             z-index: 1000;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.8);
-            transition: opacity 0.3s ease, transform 0.2s;
-            display: none;
-            opacity: 0;
+            display: none; /* Oculto por padrão, aparece quando começa a tocar .m3u8 */
+            pointer-events: none;
+            border: 1px solid #333;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
-        #btn-reload:hover { background: var(--green); color: #000; transform: scale(1.05); }
 
         @media (max-width: 768px) { body { flex-direction: column; } main { order: 1; height: 35vh; width: 100%; padding: 0; } aside { order: 2; width: 100%; height: 65vh; border-right: none; border-top: 2px solid var(--purple); } }
     </style>
@@ -83,18 +66,14 @@
     </aside>
     <main>
         <div id="player-container" ondblclick="toggleFullScreen()">
+            <div id="buffer-monitor">Aguardando vídeo...</div>
             <div id="player"></div>
-            <button id="btn-reload" onclick="reloadCurrentChannel(event)">🔄 Tentar Novamente</button>
         </div>
     </main>
     <script>
         let currentClappr;
-        let canaisRaw = []; 
-        let reloadTimeout; 
+        let canaisRaw = [];
         
-        let canalAtualData = null; 
-        let canalAtualElemento = null;
-
         async function carregarCanaisJSON() {
             try {
                 const response = await fetch('jogos.json');
@@ -129,46 +108,14 @@
                 div.onclick = () => playCanal(item, div);
                 div.ondblclick = () => toggleFullScreen();
                 l.appendChild(div);
-
-                testarLink(item.video, div);
             });
         }
 
-        async function testarLink(url, elementoHtml) {
-            if (!url) {
-                elementoHtml.classList.add('offline');
-                return;
-            }
-
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-                const response = await fetch(url, { 
-                    method: 'GET',
-                    signal: controller.signal 
-                });
-                
-                clearTimeout(timeoutId);
-
-                if (!response.ok) {
-                    elementoHtml.classList.add('offline');
-                }
-            } catch (error) {
-                elementoHtml.classList.add('offline');
-            }
-        }
-
         function playCanal(c, el){
-            canalAtualData = c;
-            canalAtualElemento = el;
-
             updateActive(el);
             clearPlayer();
-            
-            mostrarBotaoRecarregar();
-
             const p = document.getElementById('player');
+            
             let urlVideo = c.video;
 
             if (urlVideo && urlVideo.includes('.m3u8')) {
@@ -181,38 +128,18 @@
                     autoPlay: true,
                     playback: {
                         hlsjsConfig: {
-                            // Sistema Anti-Trava (Buffer e Delay)
-                            maxBufferLength: 30,       
-                            maxMaxBufferLength: 60,    
-                            liveSyncDurationCount: 3,  
-                            lowLatencyMode: false,     
-                            enableWorker: true         
+                            // CONFIGURAÇÕES AGRESSIVAS DE ANTI-TRAVAMENTO
+                            liveSyncDuration: 60, // Fica 60 segundos atrás do ao vivo real
+                            liveMaxLatencyDuration: 120, // Tolera até 2 minutos de atraso sem travar
+                            maxBufferLength: 90, // Tenta manter 90 segundos de vídeo já baixados
+                            maxMaxBufferLength: 120, 
+                            fragLoadingTimeOut: 30000,
+                            manifestLoadingTimeOut: 30000
                         }
                     }
                 });
             } else if (urlVideo) {
                 p.innerHTML = `<div class="player-wrapper"><div class="click-shield" onclick="this.remove()"></div><iframe src="${urlVideo}" allow="autoplay;fullscreen"></iframe></div>`;
-            }
-        }
-
-        function mostrarBotaoRecarregar() {
-            const btn = document.getElementById('btn-reload');
-            
-            btn.style.display = 'block';
-            setTimeout(() => btn.style.opacity = '1', 10); 
-
-            clearTimeout(reloadTimeout);
-
-            reloadTimeout = setTimeout(() => {
-                btn.style.opacity = '0';
-                setTimeout(() => btn.style.display = 'none', 300); 
-            }, 3000);
-        }
-
-        function reloadCurrentChannel(event) {
-            event.stopPropagation(); 
-            if (canalAtualData && canalAtualElemento) {
-                playCanal(canalAtualData, canalAtualElemento);
             }
         }
 
@@ -222,6 +149,7 @@
                 currentClappr = null;
             }
             document.getElementById('player').innerHTML = "";
+            document.getElementById('buffer-monitor').style.display = "none";
         }
 
         function updateActive(el){
@@ -236,6 +164,41 @@
                 el.style.display = el.innerText.toLowerCase().includes(v) ? 'flex' : 'none';
             });
         }
+
+        // Script que atualiza o Monitor de Buffer a cada segundo
+        setInterval(() => {
+            const video = document.querySelector('video');
+            const monitor = document.getElementById('buffer-monitor');
+            
+            // Só executa se existir um vídeo tocando e se o Clappr estiver ativo (evita Iframes)
+            if (video && currentClappr && !video.paused) {
+                try {
+                    let atual = video.currentTime;
+                    let baixado = 0;
+                    
+                    // Pega o ponto mais distante de vídeo que já foi baixado na memória
+                    if (video.buffered.length > 0) {
+                        baixado = video.buffered.end(video.buffered.length - 1);
+                    }
+                    
+                    let folga = (baixado - atual).toFixed(1);
+                    
+                    if(baixado > 0) {
+                        monitor.style.display = "block";
+                        
+                        // Muda a cor dependendo da segurança da folga
+                        let cor = "var(--green)"; // Seguro (Muito buffer)
+                        if(folga < 10) cor = "orange"; // Atenção
+                        if(folga < 3) cor = "red"; // Vai travar!
+
+                        monitor.style.color = cor;
+                        monitor.innerHTML = `⏱ Atual: ${Math.floor(atual)}s &nbsp;|&nbsp; 📥 Baixado: ${Math.floor(baixado)}s &nbsp;|&nbsp; 🟢 Folga: ${folga}s`;
+                    }
+                } catch(e) {}
+            } else if (monitor) {
+                monitor.style.display = "none";
+            }
+        }, 1000);
 
         window.onload = () => {
             carregarCanaisJSON();
