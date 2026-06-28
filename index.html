@@ -165,14 +165,20 @@
             const p = document.getElementById('player');
             let urlVideo = c.video;
 
-            // Lógica para links .m3u8 E .txt (Usa Clappr com proteção de Buffer)
+            // Lógica para links .m3u8 E .txt disfarçados
             if (urlVideo && (urlVideo.includes('.m3u8') || urlVideo.includes('.txt'))) {
                 isSmartBuffering = true;
                 objBufferTarget = 30; 
                 
+                // O TRUQUE: Adiciona ?.m3u8 no final se for um txt para enganar o hls.js
+                let urlMascarada = urlVideo;
+                if (urlVideo.includes('.txt') && !urlVideo.includes('.m3u8')) {
+                    urlMascarada = urlVideo + '?.m3u8';
+                }
+                
                 currentClappr = new Clappr.Player({
-                    source: urlVideo,
-                    mimeType: 'application/vnd.apple.mpegurl', // O SEGREDO: Força o Clappr a ler o .txt como HLS/TV
+                    source: urlMascarada, // Passa a URL enganosa
+                    mimeType: 'application/vnd.apple.mpegurl', // Força o tipo HLS
                     parentId: "#player",
                     plugins: [HlsjsPlayback],
                     width: '100%',
