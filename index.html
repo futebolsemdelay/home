@@ -25,12 +25,14 @@
         
         .search-box { padding: 15px; }
         .search-box input { width: 90%; background: #000; border: 1px solid #333; padding: 12px; color: var(--green); border-radius: 8px; outline: none; font-family: 'Rajdhani'; }
-        .channel-list { overflow-y: auto; flex-grow: 1; }
+        
+        /* Adicionado padding-bottom para corrigir o corte no mobile */
+        .channel-list { overflow-y: auto; flex-grow: 1; padding-bottom: 80px; }
+        
         .item { padding: 12px 15px; margin: 5px 10px; background: #1a1a1a; border-radius: 8px; display: flex; align-items: center; font-size: 16px; font-weight: 600; cursor: pointer; border-left: 4px solid transparent; user-select: none; transition: 0.2s; }
         .item:hover { background: #222; transform: translateX(5px); }
         .item.active { border-left-color: var(--green); background: rgba(138,43,226,0.15); color: var(--green); }
         
-        /* CLASSE PARA CANAIS OFFLINE */
         .item.offline { 
             background: rgba(255, 0, 0, 0.15); 
             border-left-color: #ff3333; 
@@ -43,6 +45,29 @@
         }
 
         .channel-number { min-width: 30px; font-size: 11px; color: var(--purple); margin-right: 12px; background: #000; padding: 2px 6px; border-radius: 4px; text-align: center; }
+        
+        /* Estilo do Botão de Recarregar */
+        #btn-reload {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--purple);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.8);
+            transition: opacity 0.3s ease, transform 0.2s;
+            display: none; /* Escondido por padrão */
+            opacity: 0;
+        }
+        #btn-reload:hover { background: var(--green); color: #000; transform: scale(1.05); }
+
         @media (max-width: 768px) { body { flex-direction: column; } main { order: 1; height: 35vh; width: 100%; padding: 0; } aside { order: 2; width: 100%; height: 65vh; border-right: none; border-top: 2px solid var(--purple); } }
     </style>
 </head>
@@ -61,12 +86,18 @@
     <main>
         <div id="player-container" ondblclick="toggleFullScreen()">
             <div id="player"></div>
+            <button id="btn-reload" onclick="reloadCurrentChannel(event)">🔄 Tentar Novamente</button>
         </div>
     </main>
     <script>
         let currentClappr;
         let canaisRaw = []; 
+        let reloadTimeout; // Variável para controlar o timer do botão
         
+        // Armazena os dados do canal atual para recarregar
+        let canalAtualData = null; 
+        let canalAtualElemento = null;
+
         async function carregarCanaisJSON() {
             try {
                 const response = await fetch('jogos.json');
@@ -102,12 +133,10 @@
                 div.ondblclick = () => toggleFullScreen();
                 l.appendChild(div);
 
-                // Dispara o teste do link em segundo plano
                 testarLink(item.video, div);
             });
         }
 
-        // Função para testar se o link está online
         async function testarLink(url, elementoHtml) {
             if (!url) {
                 elementoHtml.classList.add('offline');
@@ -115,33 +144,36 @@
             }
 
             try {
-                // AbortController para cancelar o teste se demorar mais que 5 segundos
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-                // Faz uma requisição leve apenas para checar o cabeçalho (status da página)
                 const response = await fetch(url, { 
-                    method: 'GET', // Algumas APIs bloqueiam HEAD, então usamos GET
+                    method: 'GET',
                     signal: controller.signal 
                 });
                 
                 clearTimeout(timeoutId);
 
-                // Se o status HTTP não for OK (ex: 404, 403, 500), marca como offline
                 if (!response.ok) {
                     elementoHtml.classList.add('offline');
                 }
             } catch (error) {
-                // Se cair aqui, a requisição foi recusada (link quebrado, offline ou erro de CORS)
                 elementoHtml.classList.add('offline');
             }
         }
 
         function playCanal(c, el){
+            // Salva as informações do canal atual para o botão "Recarregar"
+            canalAtualData = c;
+            canalAtualElemento = el;
+
             updateActive(el);
             clearPlayer();
-            const p = document.getElementById('player');
             
+            // Chama a função para exibir o botão temporariamente
+            mostrarBotaoRecarregar();
+
+            const p = document.getElementById('player');
             let urlVideo = c.video;
 
             if (urlVideo && urlVideo.includes('.m3u8')) {
@@ -155,6 +187,31 @@
                 });
             } else if (urlVideo) {
                 p.innerHTML = `<div class="player-wrapper"><div class="click-shield" onclick="this.remove()"></div><iframe src="${urlVideo}" allow="autoplay;fullscreen"></iframe></div>`;
+            }
+        }
+
+        function mostrarBotaoRecarregar() {
+            const btn = document.getElementById('btn-reload');
+            
+            // Mostra o botão e define opacidade total
+            btn.style.display = 'block';
+            setTimeout(() => btn.style.opacity = '1', 10); // pequeno delay para a transição CSS funcionar
+
+            // Limpa qualquer timer anterior para não conflitar
+            clearTimeout(reloadTimeout);
+
+            // Define o timer para esconder o botão após 3 segundos (3000 ms)
+            reloadTimeout = setTimeout(() => {
+                btn.style.opacity = '0';
+                // Aguarda a transição de opacidade (0.3s) terminar antes de dar display:none
+                setTimeout(() => btn.style.display = 'none', 300); 
+            }, 3000);
+        }
+
+        function reloadCurrentChannel(event) {
+            event.stopPropagation(); // Evita conflito caso clique duplo tente dar fullscreen
+            if (canalAtualData && canalAtualElemento) {
+                playCanal(canalAtualData, canalAtualElemento);
             }
         }
 
