@@ -25,7 +25,16 @@
         #player-container { width: 100%; height: 100%; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); position: relative; }
         #player, .player-wrapper, iframe { width: 100% !important; height: 100% !important; border: none; display: block; }
         .click-shield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; cursor: pointer; background: rgba(0,0,0,0.01); }
-        
+        #player div[data-player], 
+        #player div[data-player] > div {
+        width: 100% !important;
+        height: 100% !important;
+        }
+
+        #player-container iframe {
+        width: 100% !important;
+        height: 100% !important;
+        }
         .brand-container { border-bottom: 1px solid #222; padding: 15px 10px; text-align: center; }
         .nav-header { display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, var(--green), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; font-size: 20px; letter-spacing: 1px; }
         .search-box { padding: 15px; }
