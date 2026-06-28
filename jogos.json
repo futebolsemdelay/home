@@ -1,5 +1,12 @@
 [
   {
+    "confronto": "BAND SPORTS",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/1503332ce04a32983e4ab5ae34c33200/file.txt",
+    "audio": ""
+  },
+  {
     "confronto": "CARTOONITO",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -7,10 +14,17 @@
     "audio": ""
   },
   {
-    "confronto": "CAZÉ TV",
+    "confronto": "CAZÉ TV 1",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
-    "video": "https://b62e8626ca7f5d5c9abfa7faf04644e5.croudfront.lat/nossoplayer/7f2dec7c6f2c24a4644881e152fcb6ac/file.txt",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/78c6f17c0d6438135dbc3a36100ed74b/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "CAZÉ TV 2",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/fb0d15d6f830e4c34e7341aff51335b4/file.txt",
     "audio": ""
   },
   {
@@ -18,6 +32,34 @@
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
     "video": "https://c0f971d8cd24364f2029fcb9ac7b71f5.croudfront.lat/embedtv/0c161962a14bcc2286cc3f10c62b83dd/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "COMBATE",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/98589110377bb3975cc7e000ba7a0448/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "DISNEY PLUS 1",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/9d690d77a2a4d6380d8fb8a22d4b22af/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "DISNEY PLUS 2",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/25f68b164c1a87964c7c5d73d06042cf/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "DISNEY PLUS 3",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/60468fdd8b88efbcd803c996d208c0e1/file.txt",
     "audio": ""
   },
   {
@@ -41,7 +83,27 @@
     "video": "https://b62e8626ca7f5d5c9abfa7faf04644e5.croudfront.lat/nossoplayer/45a6d2bb4308d109fb0b85312c7f7064/file.txt",
     "audio": ""
   },
-  
+  {
+    "confronto": "ESPN 4",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/af7c5d2c482777f047d2b1b888a8bd38/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "ESPN 5",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/fc1f1187b70ec1e8d24a8febc8ec107f/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "ESPN 6",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/a9bc4b34fe68a5cccc6e7811d2c4fce1/file.txt",
+    "audio": ""
+  },
   {
     "confronto": "GLOBO",
     "esporte": "TV",
