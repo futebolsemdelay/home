@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Conteudo Reserva</title>
+    <title>Canais de TV</title>
     <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@clappr/hlsjs-playback@latest/dist/hlsjs-playback.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
@@ -20,8 +20,10 @@
         #player, .player-wrapper, iframe { width: 100% !important; height: 100% !important; border: none; display: block; }
         .click-shield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; cursor: pointer; background: rgba(0,0,0,0.01); }
         .brand-container { border-bottom: 1px solid #222; padding: 15px 10px; text-align: center; }
-        .nav-header { display: flex; align-items: center; justify-content: space-between; background: linear-gradient(90deg, var(--green), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; font-size: 18px; }
-        .nav-btn { -webkit-text-fill-color: var(--green); cursor: pointer; font-size: 24px; padding: 0 10px; }
+        
+        /* Centralizado, já que não temos mais as setinhas */
+        .nav-header { display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, var(--green), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; font-size: 20px; letter-spacing: 1px; }
+        
         .search-box { padding: 15px; }
         .search-box input { width: 90%; background: #000; border: 1px solid #333; padding: 12px; color: var(--green); border-radius: 8px; outline: none; font-family: 'Rajdhani'; }
         .channel-list { overflow-y: auto; flex-grow: 1; }
@@ -29,7 +31,6 @@
         .item:hover { background: #222; transform: translateX(5px); }
         .item.active { border-left-color: var(--green); background: rgba(138,43,226,0.15); color: var(--green); }
         .channel-number { min-width: 30px; font-size: 11px; color: var(--purple); margin-right: 12px; background: #000; padding: 2px 6px; border-radius: 4px; text-align: center; }
-        .movie-thumb { width: 40px; height: 55px; border-radius: 4px; margin-right: 12px; object-fit: cover; border: 1px solid #333; }
         @media (max-width: 768px) { body { flex-direction: column; } main { order: 1; height: 35vh; width: 100%; padding: 0; } aside { order: 2; width: 100%; height: 65vh; border-right: none; border-top: 2px solid var(--purple); } }
     </style>
 </head>
@@ -37,13 +38,11 @@
     <aside>
         <div class="brand-container">
             <div class="nav-header">
-                <span class="nav-btn" onclick="toggleMode()">❮</span>
-                <span id="current-mode-title">TODOS CANAIS</span>
-                <span class="nav-btn" onclick="toggleMode()">❯</span>
+                <span>CANAIS DE TV</span>
             </div>
         </div>
         <div class="search-box">
-            <input type="text" id="filter" placeholder="🔍 Buscar..." onkeyup="filterList()">
+            <input type="text" id="filter" placeholder="🔍 Buscar canal..." onkeyup="filterList()">
         </div>
         <div class="channel-list" id="contentList"></div>
     </aside>
@@ -53,54 +52,9 @@
         </div>
     </main>
     <script>
-        const embedBase = "https://www2.embedtv.best/";
-        let currentMode = 'canais';
         let currentClappr;
+        let canaisRaw = []; // Preenchido pelo JSON
         
-        let canaisRaw = []; // Agora será preenchido dinamicamente pelo JSON
-        
-        // Mantive a lista de filmes para que o botão de "Canais / Filmes" continue funcionando
-        const filmesRaw = [
-            {titulo:"A Bruxa do Gelo",capaUrl:"https://image.tmdb.org/t/p/w400/nE8kvNUcEQ1HhILzT5gDPM5Lj25.jpg",videoUrl:"https://fenix7.mazalemp.click/Vod/Filmes2023/Filmes_Novembro/Dezembro/26-12/A.Bruxa.do.Gelo.2022.mp4"},
-            {titulo:"A Festa de Casamento",capaUrl:"https://image.tmdb.org/t/p/w400/20PDwJrPRSFczAzLyio8pHgAGKU.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Novembro/15-11/A.Festa.de.Casamento.mp4"},
-            {titulo:"A Lenda do Lobo da Montanha",capaUrl:"https://image.tmdb.org/t/p/w400/o0XZMcbtYsxOMuTFT8T9qOPKYhO.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Outubro/18-10/A.Lenda.do.Lobo.da.Montanha.2024.mp4"},
-            {titulo:"A Maldicao de Savannah",capaUrl:"https://image.tmdb.org/t/p/w400/dLoIGT1rCQ9IM1Oa38gwx1GFD00.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Novembro/13-11/A.Maldicao.de.Savannah.mp4"},
-            {titulo:"Abigail",capaUrl:"https://image.tmdb.org/t/p/w400/3rNWxdsUYDsDxHrEc3OmXZVdKwJ.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Maio/26-05/Abigail.2024.mp4"},
-            {titulo:"As Cores do Mal Vermelho",capaUrl:"https://image.tmdb.org/t/p/w400/s1h7CqxjZg3yreNVjXQaBdGMVaw.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Maio/29-05/As.Cores.do.Mal%3A.Vermelho.2024.mp4"},
-            {titulo:"Baila Vini",capaUrl:"https://image.tmdb.org/t/p/w400/s1zEsvB5XoS0Gqr7tmnNZExVdRI.jpg",videoUrl:"https://fenix7.mazalemp.click/VOD/FILMES/MAIO/Baila.Vini.mp4"},
-            {titulo:"Cacula",capaUrl:"https://image.tmdb.org/t/p/w400/uc2txUknq7W3ZyZN0hiwgvpoOOj.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Outubro/11-10/Cacula.2024.mp4"},
-            {titulo:"Cao e Gato",capaUrl:"https://image.tmdb.org/t/p/w400/waz72aByMcu9cLJWzC7pTu4NjEY.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Marco/19-03/Cao.e.Gato.2024.mp4"},
-            {titulo:"Cedo Demais",capaUrl:"https://image.tmdb.org/t/p/w400/4u0WFuYUagULcnTp11JDlh9jjLa.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Abril/10-04/Cedo.Demais.(2024).mp4"},
-            {titulo:"Cinzas",capaUrl:"https://image.tmdb.org/t/p/w400/gpc0f8adtJ2IImB3xoUDZeMAade.jpg",videoUrl:"https://fenix7.mazalemp.click/Vod/Filmes2023/Filmes_Novembro/Fevereiro/12-02/Cinzas.2024.mp4"},
-            {titulo:"Codigo Alarum",capaUrl:"https://image.tmdb.org/t/p/w400/3wguDZosR8jc4mDG1jXfQKIPMXz.jpg",videoUrl:"https://fenix7.mazalemp.click/JUNHO/Codigo.Alarum.mp4"},
-            {titulo:"Felicidade e",capaUrl:"https://image.tmdb.org/t/p/w400/aQxf2xZjMoerIAqR8grFzPFNDaO.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Novembro/15-11/Felicidade.e.mp4"},
-            {titulo:"Flutuar",capaUrl:"https://image.tmdb.org/t/p/w400/cweYrK30AExirAMewzTcZnV51D1.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Maio/18-05/Float.2024.mp4"},
-            {titulo:"Furia Assassina",capaUrl:"https://image.tmdb.org/t/p/w400/xy7l2WWzy5Q6C1e0EUhfLFHWnpJ.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Julho/18-07/Furia.Assassina.2024.mp4"},
-            {titulo:"Furiosa Uma Saga Mad Max",capaUrl:"https://image.tmdb.org/t/p/w400/7qOSKoOAPgemYhBwbJgBWcCxPWZ.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Junho/05-06/Furiosa%3A.Uma.Saga.Mad.Max.2024.mp4"},
-            {titulo:"Johnny e Clyde",capaUrl:"https://image.tmdb.org/t/p/w400/h3luJ9fz6IuqBSMuafRgkGf2nvW.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Novembro/15-11/Johnny.&.Clyde.Parceiros.no.Crime.mp4"},
-            {titulo:"LaRoy Texas",capaUrl:"https://image.tmdb.org/t/p/w400/ySlZE3n43iXDBtGBWdc6dTBRiiM.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Maio/27-05/LaRoy.Texas.2024.mp4"},
-            {titulo:"Lights Out",capaUrl:"https://image.tmdb.org/t/p/w400/dwcXOX4p0Wecvw3jzEe9GjlRI5Y.jpg",videoUrl:"https://fenix7.mazalemp.click/Vod/Filmes2023/Filmes_Novembro/Fevereiro/22-02/Lights.Out.2024.mp4"},
-            {titulo:"Lobisomens",capaUrl:"https://image.tmdb.org/t/p/w400/ldCKvSF1iNmNPRC7PurYwcX7CuG.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Outubro/24-10/Lobisomens.2024.mp4"},
-            {titulo:"Mais Uma Vida",capaUrl:"https://image.tmdb.org/t/p/w400/byMdaD2oQNmgcI9Ohak9m1T0wE0.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Maio/01-05/Mais.Uma.Vida.2022.mp4"},
-            {titulo:"Mea Culpa",capaUrl:"https://image.tmdb.org/t/p/w400/roxD9VCTTXYfPjVj9HiSC5IMtc7.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Fevereiro/26-02/Mea.Culpa.%282024%29.mp4"},
-            {titulo:"Natal Sangrento",capaUrl:"https://image.tmdb.org/t/p/w400/veVP190MsLCig2sYpKBuVvp2vCg.jpg",videoUrl:"https://fenix7.mazalemp.click/VOD/FILMES/AGOSTO/Natal.Sangrento.CINEMA.mp4"},
-            {titulo:"Noite de Paris",capaUrl:"https://image.tmdb.org/t/p/w400/8svyTfpaaHfzOufcvus02Nn2etS.jpg",videoUrl:"https://fenix7.mazalemp.click/Vod/Filmes11/214968.mp4"},
-            {titulo:"O Exorcismo",capaUrl:"https://image.tmdb.org/t/p/w400/3tE6r2IaABY08EcIKF51qACri8H.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Outubro/18-10/O.Exorcismo.2024.mp4"},
-            {titulo:"O Mal que Nos Habita",capaUrl:"https://image.tmdb.org/t/p/w400/t6cWfm0o5TzCa3nHtHhXpzjBc8V.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Abril/10-04/O.Mal.que.Nos.Habita.2023.mp4"},
-            {titulo:"O Rei dos Reis",capaUrl:"https://image.tmdb.org/t/p/w400/as6hYQcPyv4f3Lrb4svPWV0nVaz.jpg",videoUrl:"https://fenix7.mazalemp.click/Vod/Filmes04/42929.mp4"},
-            {titulo:"O Ritual do Livro Vermelho",capaUrl:"https://image.tmdb.org/t/p/w400/hrelSJo0YlMYyRiJuvkdVvgooxb.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Junho/04-06/O.Ritual.do.Livro.Vermelho.2022.mp4"},
-            {titulo:"Operacao Resgate",capaUrl:"https://image.tmdb.org/t/p/w400/vA90gPM2rueydorwv6jrZg150kr.jpg",videoUrl:"https://fenix7.mazalemp.click/VOD/FILMES/JUNHO/Operacao.Resgate.mp4"},
-            {titulo:"Oscar",capaUrl:"https://image.tmdb.org/t/p/w400/bX4CMpqyCCRjpXW6OOaqcXsaiRU.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Marco/12-03/Oscar2024.mp4"},
-            {titulo:"Sangue Frio",capaUrl:"https://image.tmdb.org/t/p/w400/52IPpDucAJh1IxrvWJ4x1hBHum4.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Abril/07-04/Sangue.Frio.2024.mp4"},
-            {titulo:"Sem Coracao",capaUrl:"https://image.tmdb.org/t/p/w400/9TuKi2XgWvAuVbsp5jKLOzxgdXA.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Junho/Sem.Coracao.2024.mp4"},
-            {titulo:"Sob Custodia",capaUrl:"https://image.tmdb.org/t/p/w400/eqM5cBvLKSrcvGAyWf92tSVSQuT.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Novembro/19-11/Sob.Custodia.2024..mp4"},
-            {titulo:"Terras Selvagens",capaUrl:"https://image.tmdb.org/t/p/w400/r3eg88OcnLcCihQdaW3IAOlui4F.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Abril/07-04/Savage.Lands.2024..mp4"},
-            {titulo:"Xeque Mate",capaUrl:"https://image.tmdb.org/t/p/w400/h0cp9DMcP9MFvt3FQlrr4RAwzIX.jpg",videoUrl:"https://fenix7.mazalemp.click/Filmes2024/Marco/02-03/Xeque.Mate.%282024%29.mp4"},
-            {titulo:"60 Minutos",capaUrl:"https://image.tmdb.org/t/p/w400/i5pJ8IoOanVAPBzKi3GiVnGlOld.jpg",videoUrl:"https://fenix7.mazalemp.click/Vod/Filmes2023/Filmes_Novembro/Janeiro/22-01/60.Minutos.(2024).mp4"}
-        ];
-
-        filmesRaw.sort((a,b)=>a.titulo.localeCompare(b.titulo));
-
         // Função para carregar os canais/jogos através do JSON na pasta local
         async function carregarCanaisJSON() {
             try {
@@ -111,14 +65,8 @@
                 renderList();
             } catch (error) {
                 console.error("Erro ao carregar jogos.json:", error);
-                document.getElementById('contentList').innerHTML = `<div class="item" style="color:red; text-align:center; font-size:14px;">Erro ao carregar 'jogos.json'. Verifique se o servidor local está ativo.</div>`;
+                document.getElementById('contentList').innerHTML = `<div class="item" style="color:red; text-align:center; font-size:14px; display:block;">Erro ao carregar 'jogos.json'. Verifique se o servidor local está ativo.</div>`;
             }
-        }
-
-        function toggleMode(){
-            currentMode = (currentMode==='canais') ? 'filmes' : 'canais';
-            document.getElementById('current-mode-title').innerText = currentMode.toUpperCase();
-            renderList();
         }
 
         function toggleFullScreen(){
@@ -130,24 +78,17 @@
         function renderList(){
             const l = document.getElementById('contentList');
             l.innerHTML = "";
-            const d = (currentMode==='canais') ? canaisRaw : filmesRaw;
             
-            d.forEach((item,idx) => {
+            canaisRaw.forEach((item, idx) => {
                 const div = document.createElement('div');
                 div.className = 'item';
                 const num = (idx+1).toString().padStart(2,'0');
                 
-                if(currentMode==='canais'){
-                    // Extrai os campos do JSON novo
-                    const tituloFormatado = item.confronto ? `[${item.horario}] ${item.confronto}` : "Canal Desconhecido";
-                    
-                    div.innerHTML = `<span class="channel-number">${num}</span><span>${tituloFormatado}</span>`;
-                    div.onclick = () => playCanal(item, div);
-                } else {
-                    div.innerHTML = `<span class="channel-number">${num}</span><img src="${item.capaUrl}" class="movie-thumb"><span>${item.titulo}</span>`;
-                    div.onclick = () => playMovie(item, div);
-                }
+                // Puxa apenas o nome do confronto (Canal)
+                const tituloFormatado = item.confronto ? item.confronto : "Canal Desconhecido";
                 
+                div.innerHTML = `<span class="channel-number">${num}</span><span>${tituloFormatado}</span>`;
+                div.onclick = () => playCanal(item, div);
                 div.ondblclick = () => toggleFullScreen();
                 l.appendChild(div);
             });
@@ -158,10 +99,8 @@
             clearPlayer();
             const p = document.getElementById('player');
             
-            // Pega o link do vídeo de acordo com o campo "video" do seu novo JSON
             let urlVideo = c.video;
 
-            // Lógica inteligente: se for .m3u8 usa o Clappr, senão (como os .txt do seu JSON) usa Iframe
             if (urlVideo && urlVideo.includes('.m3u8')) {
                 currentClappr = new Clappr.Player({
                     source: urlVideo,
@@ -172,22 +111,8 @@
                     autoPlay: true
                 });
             } else if (urlVideo) {
-                // Links que terminam em .txt ou embed players padrões rodam via iframe
                 p.innerHTML = `<div class="player-wrapper"><div class="click-shield" onclick="this.remove()"></div><iframe src="${urlVideo}" allow="autoplay;fullscreen"></iframe></div>`;
             }
-        }
-
-        function playMovie(m, el){
-            updateActive(el);
-            clearPlayer();
-            currentClappr = new Clappr.Player({
-                source: m.videoUrl,
-                parentId: "#player",
-                plugins: [HlsjsPlayback],
-                width: '100%',
-                height: '100%',
-                autoPlay: true
-            });
         }
 
         function clearPlayer(){
@@ -212,7 +137,6 @@
         }
 
         window.onload = () => {
-            // Inicializa buscando o arquivo JSON
             carregarCanaisJSON();
         };
     </script>
