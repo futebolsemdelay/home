@@ -78,7 +78,14 @@
     "audio": ""
   },
   {
-    "confronto": "SBT",
+    "confronto": "SBT RJ",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/8452830c1edc3688283d1ec2329ceb6a/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "SBT SP",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
     "video": "https://b62e8626ca7f5d5c9abfa7faf04644e5.croudfront.lat/nossoplayer/5bdeb7c023e4177fd12a311d3f213ab8/file.txt",
