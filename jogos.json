@@ -28,6 +28,13 @@
     "audio": ""
   },
   {
+    "confronto": "CARTOON NETWORK",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/0f285d27af270ab3eff997a59507cef2/file.txt",
+    "audio": ""
+  },
+  {
     "confronto": "CARTOONITO",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -70,6 +77,13 @@
     "audio": ""
   },
   {
+    "confronto": "DISCOVERY KIDS",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/15142f964eccae7a16f4c3bf38d561b9/file.txt",
+    "audio": ""
+  },
+  {
     "confronto": "DISNEY PLUS 1",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -88,6 +102,13 @@
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
     "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/60468fdd8b88efbcd803c996d208c0e1/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "DRAGON BALL Z 24H",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/7abd416850216d25d517ea09a5861ef1/file.txt",
     "audio": ""
   },
   {
@@ -139,6 +160,28 @@
     "video": "https://b62e8626ca7f5d5c9abfa7faf04644e5.croudfront.lat/nossoplayer/c12e6a5cb7717ac506c364e9d6af22d4/file.txt",
     "audio": ""
   },
+  {
+    "confronto": "GLOOB",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/44fe6cf6557a44023b2730739ccd9d0c/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "NARUTO CLASSIC 24H",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/7dcc07b4bcac52f94402936213ab2a3f/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "OS SIMPSONS 24H",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/c3b516c77fd555bf26895d225f2634e0/file.txt",
+    "audio": ""
+  },
+  
   {
     "confronto": "PREMIERE 1",
     "esporte": "TV",
