@@ -5,33 +5,44 @@
     <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Canais de TV</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@clappr/hlsjs-playback@latest/dist/hlsjs-playback.min.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     
     <style>
         :root { --bg: #111; --sidebar-bg: #151515; --purple: #8a2be2; --green: #00ff88; --text: #ffffff; }
         body { background-color: var(--bg); color: var(--text); font-family: 'Rajdhani', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Scrollbar */
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: #111; }
         ::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 10px; }
+        
+        /* Layout Principal */
         aside { width: 320px; background: var(--sidebar-bg); border-right: 1px solid rgba(138,43,226,0.3); display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
         main { flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 20px; background: radial-gradient(circle, #1a1a1a 0%, #111 100%); }
+        
+        /* Contêiner do Player e Elementos Internos */
         #player-container { width: 100%; height: 100%; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); position: relative; }
         #player, .player-wrapper, iframe { width: 100% !important; height: 100% !important; border: none; display: block; }
         .click-shield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; cursor: pointer; background: rgba(0,0,0,0.01); }
+        
+        /* Menu Lateral */
         .brand-container { border-bottom: 1px solid #222; padding: 15px 10px; text-align: center; }
-        
         .nav-header { display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, var(--green), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; font-size: 20px; letter-spacing: 1px; }
-        
         .search-box { padding: 15px; }
         .search-box input { width: 90%; background: #000; border: 1px solid #333; padding: 12px; color: var(--green); border-radius: 8px; outline: none; font-family: 'Rajdhani'; }
         .channel-list { overflow-y: auto; flex-grow: 1; }
+        
+        /* Itens da Lista */
         .item { padding: 12px 15px; margin: 5px 10px; background: #1a1a1a; border-radius: 8px; display: flex; align-items: center; font-size: 16px; font-weight: 600; cursor: pointer; border-left: 4px solid transparent; user-select: none; transition: 0.2s; }
         .item:hover { background: #222; transform: translateX(5px); }
         .item.active { border-left-color: var(--green); background: rgba(138,43,226,0.15); color: var(--green); }
         .channel-number { min-width: 30px; font-size: 11px; color: var(--purple); margin-right: 12px; background: #000; padding: 2px 6px; border-radius: 4px; text-align: center; }
         
+        /* Overlays e Monitores do Smart Buffer */
         #buffer-monitor { position: absolute; top: 15px; left: 15px; background: rgba(0, 0, 0, 0.8); color: var(--green); padding: 8px 12px; border-radius: 6px; font-size: 14px; font-weight: bold; z-index: 1000; display: none; pointer-events: none; border: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         #smart-buffer-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-family: 'Rajdhani', sans-serif; }
         .spinner { width: 50px; height: 50px; border: 5px solid rgba(138,43,226,0.3); border-top-color: var(--green); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
@@ -39,6 +50,42 @@
         .progress-text { font-size: 24px; font-weight: bold; color: var(--green); }
         .progress-sub { font-size: 16px; color: #aaa; margin-top: 5px; }
 
+        /* Barra de Progresso Customizada (Estilo VLC/YouTube) */
+        #custom-progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+            transition: height 0.2s ease;
+        }
+        #player-container:hover #custom-progress-bar {
+            height: 12px;
+        }
+        #bar-buffered {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.4);
+            width: 0%;
+            transition: width 0.3s linear;
+        }
+        #bar-played {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: var(--green);
+            width: 0%;
+            box-shadow: 0 0 10px var(--green);
+            transition: width 0.3s linear;
+        }
+
+        /* Responsividade */
         @media (max-width: 768px) { body { flex-direction: column; } main { order: 1; height: 35vh; width: 100%; padding: 0; } aside { order: 2; width: 100%; height: 65vh; border-right: none; border-top: 2px solid var(--purple); } }
     </style>
 </head>
@@ -48,15 +95,24 @@
         <div class="search-box"><input type="text" id="filter" placeholder="🔍 Buscar canal..." onkeyup="filterList()"></div>
         <div class="channel-list" id="contentList"></div>
     </aside>
+    
     <main>
         <div id="player-container" ondblclick="toggleFullScreen()">
+            
             <div id="buffer-monitor">Aguardando...</div>
             <div id="smart-buffer-overlay">
                 <div class="spinner"></div>
                 <div class="progress-text" id="overlay-text">A Acumular Buffer: 0s / 30s</div>
                 <div class="progress-sub">Preparando a transmissão...</div>
             </div>
+            
+            <div id="custom-progress-bar">
+                <div id="bar-buffered"></div>
+                <div id="bar-played"></div>
+            </div>
+            
             <div id="player"></div>
+            
         </div>
     </main>
 
@@ -66,6 +122,7 @@
         let isSmartBuffering = false;
         let objBufferTarget = 30; 
         
+        // 1. Carrega o JSON
         async function carregarCanaisJSON() {
             try {
                 const response = await fetch('jogos.json');
@@ -77,12 +134,14 @@
             }
         }
 
+        // 2. Tela Cheia Duplo Clique
         function toggleFullScreen(){
             const c = document.getElementById('player-container');
             if(!document.fullscreenElement) c.requestFullscreen();
             else document.exitFullscreen();
         }
 
+        // 3. Renderiza a Lista Lateral
         function renderList(){
             const l = document.getElementById('contentList');
             l.innerHTML = "";
@@ -99,17 +158,17 @@
             });
         }
 
+        // 4. Inicia o Vídeo Escolhido
         function playCanal(c, el){
             updateActive(el);
             clearPlayer();
             const p = document.getElementById('player');
-            
             let urlVideo = c.video;
 
-            // Usa o Clappr se for link de vídeo direto (M3U8)
+            // Lógica para links .m3u8 (Usa Clappr com proteção de Buffer)
             if (urlVideo && urlVideo.includes('.m3u8')) {
                 isSmartBuffering = true;
-                objBufferTarget = 30; // Alvo de 30 segundos
+                objBufferTarget = 30; 
                 
                 currentClappr = new Clappr.Player({
                     source: urlVideo,
@@ -132,19 +191,19 @@
                     },
                     events: {
                         onReady: function() {
-                            // Garante que o vídeo inicie pausado para o seu motor de buffer agir
                             const videoTag = document.querySelector('video');
                             if(videoTag) videoTag.pause();
                         }
                     }
                 });
             } else if (urlVideo) {
-                // Se for um link de Iframe, remove o overlay/monitor e exibe normalmente (Buffer não controlável)
+                // Se for página de Embed/Iframe (Sem proteção de Buffer)
                 isSmartBuffering = false;
                 p.innerHTML = `<div class="player-wrapper"><div class="click-shield" onclick="this.remove()"></div><iframe src="${urlVideo}" allow="autoplay;fullscreen"></iframe></div>`;
             }
         }
 
+        // 5. Limpa a tela ao trocar de canal
         function clearPlayer(){
             if(currentClappr){
                 currentClappr.destroy();
@@ -153,6 +212,7 @@
             document.getElementById('player').innerHTML = "";
             document.getElementById('buffer-monitor').style.display = "none";
             document.getElementById('smart-buffer-overlay').style.display = "none";
+            document.getElementById('custom-progress-bar').style.display = "none";
             isSmartBuffering = false;
         }
 
@@ -168,12 +228,17 @@
             });
         }
 
-        // Motor de Pausa Inteligente (Só roda ativamente se for um vídeo do Clappr)
+        // 6. MOTOR DE PAUSA INTELIGENTE E BARRA DE PROGRESSO
         setInterval(() => {
             const video = document.querySelector('video');
             const monitor = document.getElementById('buffer-monitor');
             const overlay = document.getElementById('smart-buffer-overlay');
             const overlayText = document.getElementById('overlay-text');
+            
+            // Elementos da barra de progresso
+            const progressBar = document.getElementById('custom-progress-bar');
+            const barBuffered = document.getElementById('bar-buffered');
+            const barPlayed = document.getElementById('bar-played');
             
             if (video && currentClappr) {
                 try {
@@ -187,6 +252,7 @@
                     let folga = (baixado - atual);
                     if(folga < 0) folga = 0;
 
+                    // Gestão do Overlay de Carregamento
                     if (isSmartBuffering) {
                         if (!video.paused) video.pause();
                         
@@ -199,12 +265,14 @@
                             video.play(); 
                         }
                     } else {
+                        // Se a folga cair muito, força uma nova pausa inteligente
                         if (folga < 3 && atual > 0 && !video.paused) {
                             isSmartBuffering = true;
-                            objBufferTarget = 20; // Reduz a meta no re-buffer para não irritar muito o usuário
+                            objBufferTarget = 20; 
                         }
                     }
 
+                    // Gestão do Monitor Textual Superior
                     if(baixado > 0) {
                         monitor.style.display = "block";
                         let cor = "var(--green)";
@@ -215,10 +283,29 @@
                         monitor.innerHTML = `⏱ Atual: ${Math.floor(atual)}s &nbsp;|&nbsp; 📥 Baixado: ${Math.floor(baixado)}s &nbsp;|&nbsp; 🟢 Folga: ${folga.toFixed(1)}s`;
                     }
 
+                    // Gestão da Barra de Progresso Visual
+                    progressBar.style.display = "block";
+                    let duracao = video.duration;
+
+                    if (duracao && duracao !== Infinity && duracao > 0) {
+                        // Modo VOD (Vídeo Gravado)
+                        barBuffered.style.width = (baixado / duracao * 100) + "%";
+                        barPlayed.style.width = (atual / duracao * 100) + "%";
+                    } else {
+                        // Modo Ao Vivo (HLS / m3u8)
+                        if (baixado > 0) {
+                            let percentLido = (atual / baixado) * 100;
+                            barBuffered.style.width = "100%"; // O total baixado representa 100% da barra visível
+                            barPlayed.style.width = percentLido + "%"; // A barra verde corre atrás do final
+                        }
+                    }
+
                 } catch(e) {}
-            } else if (monitor) {
-                monitor.style.display = "none";
-                overlay.style.display = "none";
+            } else {
+                // Esconde as ferramentas caso seja Iframe ou erro no vídeo
+                if (monitor) monitor.style.display = "none";
+                if (overlay) overlay.style.display = "none";
+                if (progressBar) progressBar.style.display = "none";
             }
         }, 500);
 
