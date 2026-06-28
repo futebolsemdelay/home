@@ -1,5 +1,12 @@
 [
   {
+    "confronto": "A&N",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/db51064fb9761c5f190b38614ccbe0a8/file.txt",
+    "audio": ""
+  },
+  {
     "confronto": "A BOLA PT",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -7,10 +14,31 @@
     "audio": ""
   },
   {
+    "confronto": "ADULT SWIN",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/c50be15528f241afad8072ce40e4e85a/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "AMC",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/ef19b52b0603fc17fd2d3a07d15f6b00/file.txt",
+    "audio": ""
+  },
+  {
     "confronto": "ANIMAL PLANET",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
     "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/5772fae6b7e4dc597659d7a02bcc0640/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "AXN",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/4e17ab2ae8a6bf9f49e8376715197c11/file.txt",
     "audio": ""
   },
   {
@@ -67,6 +95,13 @@
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
     "video": "https://c0f971d8cd24364f2029fcb9ac7b71f5.croudfront.lat/embedtv/0c161962a14bcc2286cc3f10c62b83dd/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "CINEMAX",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/2e8c864a9c03c902adef34c636cb5337/file.txt",
     "audio": ""
   },
   {
@@ -216,6 +251,70 @@
     "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/44fe6cf6557a44023b2730739ccd9d0c/file.txt",
     "audio": ""
   },
+  {
+    "confronto": "GNT",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/992c5ec195cd3ef9c601fa7015710f98/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "HBO",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/b37f2e8651fb66df02488f820fa57ca4/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "HBO 2",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/19f738ee1973535516fd002f0dae347f/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "HBO FAMILY",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/437a30c96497e771170b09f6df633f3d/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "HBO MUNDI",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/76b01eddeeeabc01312d857be63ff97c/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "HBO POP",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/95887f9a5e41f9cbb2add5c4180d23c2/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "HBO PLUS",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/0a766d494cfd4adf02fa954bb8dbb52a/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "HBO XTREME",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/cb9ed13e4763f55faff18f70d1e5dfca/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "HGTV",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/b1fe06c6fd2bfb082323e9158c34b28f/file.txt",
+    "audio": ""
+  },
+  
   {
     "confronto": "HISTORY",
     "esporte": "TV",
