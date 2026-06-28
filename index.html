@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Canais de TV - Auto HLS</title>
+    <title>Canais de TV</title>
     <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@clappr/hlsjs-playback@latest/dist/hlsjs-playback.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
@@ -104,19 +104,7 @@
             
             let urlVideo = c.video;
 
-            // ==========================================
-            // LÓGICA DE CONVERSÃO AUTOMÁTICA (TXT -> M3U8)
-            // ==========================================
-            if (urlVideo && urlVideo.includes('file.txt')) {
-                urlVideo = urlVideo
-                    .replace('/embedtv/', '/hls/')
-                    .replace('/nossoplayer/', '/hls/')
-                    .replace('/file.txt', '.m3u8');
-                
-                console.log("Link convertido automaticamente para:", urlVideo);
-            }
-
-            // Agora testa se o link gerado (ou original) é m3u8
+            // Se for um link M3U8 limpo (sem bloqueios), usa o Clappr e o Smart Buffer
             if (urlVideo && urlVideo.includes('.m3u8')) {
                 isSmartBuffering = true;
                 
@@ -139,7 +127,8 @@
                     }
                 });
             } else if (urlVideo) {
-                // Caso falhe a conversão por algum motivo estranho e continue como Iframe
+                // Se for um link de Iframe (.txt), remove o overlay/monitor e exibe normalmente
+                isSmartBuffering = false;
                 p.innerHTML = `<div class="player-wrapper"><div class="click-shield" onclick="this.remove()"></div><iframe src="${urlVideo}" allow="autoplay;fullscreen"></iframe></div>`;
             }
         }
@@ -167,7 +156,7 @@
             });
         }
 
-        // Motor de Pausa Inteligente
+        // Motor de Pausa Inteligente (Só roda ativamente se for um vídeo do Clappr)
         setInterval(() => {
             const video = document.querySelector('video');
             const monitor = document.getElementById('buffer-monitor');
