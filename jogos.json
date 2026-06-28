@@ -14,6 +14,20 @@
     "audio": ""
   },
   {
+    "confronto": "BENFICA TV PT",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/8dc47c07980aab0fc57ff4959023e618/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "CANAL 11 PT",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/a26d9cdec15c49df095d7b0594118c6b/file.txt",
+    "audio": ""
+  },
+  {
     "confronto": "CARTOONITO",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -46,6 +60,13 @@
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
     "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/98589110377bb3975cc7e000ba7a0448/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "DAZN 1",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/7e6e972a8aedde3232170333c159b7c3/file.txt",
     "audio": ""
   },
   {
@@ -200,6 +221,34 @@
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
     "video": "https://b62e8626ca7f5d5c9abfa7faf04644e5.croudfront.lat/nossoplayer/a9659d1b3d3a3d515d04ba0204b6f0a8/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "SPORTV PT 2",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/27933b40ec62e0886221537b2321ba23/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "SPORTV PT 3",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/95b1e980d8f227f72ae152d2bb7e5887/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "SPORTV PT 4",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/e21b509ebb18d433601d548c9534f58c/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "SPORTV PT 5",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/ad4eb5fb9451b172e8ef003b270ee5c8/file.txt",
     "audio": ""
   },
   {
