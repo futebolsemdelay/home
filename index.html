@@ -165,13 +165,14 @@
             const p = document.getElementById('player');
             let urlVideo = c.video;
 
-            // Lógica para links .m3u8 (Usa Clappr com proteção de Buffer)
-            if (urlVideo && urlVideo.includes('.m3u8')) {
+            // Lógica para links .m3u8 E .txt (Usa Clappr com proteção de Buffer)
+            if (urlVideo && (urlVideo.includes('.m3u8') || urlVideo.includes('.txt'))) {
                 isSmartBuffering = true;
                 objBufferTarget = 30; 
                 
                 currentClappr = new Clappr.Player({
                     source: urlVideo,
+                    mimeType: 'application/vnd.apple.mpegurl', // O SEGREDO: Força o Clappr a ler o .txt como HLS/TV
                     parentId: "#player",
                     plugins: [HlsjsPlayback],
                     width: '100%',
@@ -197,7 +198,7 @@
                     }
                 });
             } else if (urlVideo) {
-                // Se for página de Embed/Iframe (Sem proteção de Buffer)
+                // Se for página de Embed/Iframe que não é .txt nem .m3u8
                 isSmartBuffering = false;
                 p.innerHTML = `<div class="player-wrapper"><div class="click-shield" onclick="this.remove()"></div><iframe src="${urlVideo}" allow="autoplay;fullscreen"></iframe></div>`;
             }
@@ -235,7 +236,6 @@
             const overlay = document.getElementById('smart-buffer-overlay');
             const overlayText = document.getElementById('overlay-text');
             
-            // Elementos da barra de progresso
             const progressBar = document.getElementById('custom-progress-bar');
             const barBuffered = document.getElementById('bar-buffered');
             const barPlayed = document.getElementById('bar-played');
@@ -265,7 +265,6 @@
                             video.play(); 
                         }
                     } else {
-                        // Se a folga cair muito, força uma nova pausa inteligente
                         if (folga < 3 && atual > 0 && !video.paused) {
                             isSmartBuffering = true;
                             objBufferTarget = 20; 
@@ -288,21 +287,18 @@
                     let duracao = video.duration;
 
                     if (duracao && duracao !== Infinity && duracao > 0) {
-                        // Modo VOD (Vídeo Gravado)
                         barBuffered.style.width = (baixado / duracao * 100) + "%";
                         barPlayed.style.width = (atual / duracao * 100) + "%";
                     } else {
-                        // Modo Ao Vivo (HLS / m3u8)
                         if (baixado > 0) {
                             let percentLido = (atual / baixado) * 100;
-                            barBuffered.style.width = "100%"; // O total baixado representa 100% da barra visível
-                            barPlayed.style.width = percentLido + "%"; // A barra verde corre atrás do final
+                            barBuffered.style.width = "100%"; 
+                            barPlayed.style.width = percentLido + "%"; 
                         }
                     }
 
                 } catch(e) {}
             } else {
-                // Esconde as ferramentas caso seja Iframe ou erro no vídeo
                 if (monitor) monitor.style.display = "none";
                 if (overlay) overlay.style.display = "none";
                 if (progressBar) progressBar.style.display = "none";
