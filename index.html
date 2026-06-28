@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Canais de TV - Smart Buffer</title>
+    <title>Canais de TV - Auto HLS</title>
     <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@clappr/hlsjs-playback@latest/dist/hlsjs-playback.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
@@ -31,21 +31,8 @@
         .item.active { border-left-color: var(--green); background: rgba(138,43,226,0.15); color: var(--green); }
         .channel-number { min-width: 30px; font-size: 11px; color: var(--purple); margin-right: 12px; background: #000; padding: 2px 6px; border-radius: 4px; text-align: center; }
         
-        /* Monitor de Diagnóstico */
-        #buffer-monitor {
-            position: absolute; top: 15px; left: 15px; background: rgba(0, 0, 0, 0.8);
-            color: var(--green); padding: 8px 12px; border-radius: 6px; font-size: 14px;
-            font-weight: bold; z-index: 1000; display: none; pointer-events: none;
-            border: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-
-        /* Ecrã de Carregamento Forçado (Smart Buffering) */
-        #smart-buffer-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85); z-index: 2000; display: none;
-            flex-direction: column; align-items: center; justify-content: center;
-            color: #fff; font-family: 'Rajdhani', sans-serif;
-        }
+        #buffer-monitor { position: absolute; top: 15px; left: 15px; background: rgba(0, 0, 0, 0.8); color: var(--green); padding: 8px 12px; border-radius: 6px; font-size: 14px; font-weight: bold; z-index: 1000; display: none; pointer-events: none; border: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        #smart-buffer-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-family: 'Rajdhani', sans-serif; }
         .spinner { width: 50px; height: 50px; border: 5px solid rgba(138,43,226,0.3); border-top-color: var(--green); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .progress-text { font-size: 24px; font-weight: bold; color: var(--green); }
@@ -62,15 +49,12 @@
     </aside>
     <main>
         <div id="player-container" ondblclick="toggleFullScreen()">
-            
             <div id="buffer-monitor">Aguardando...</div>
-            
             <div id="smart-buffer-overlay">
                 <div class="spinner"></div>
                 <div class="progress-text" id="overlay-text">A Acumular Buffer: 0s / 30s</div>
-                <div class="progress-sub">Para garantir que a transmissão não trava...</div>
+                <div class="progress-sub">Preparando a transmissão...</div>
             </div>
-
             <div id="player"></div>
         </div>
     </main>
@@ -78,7 +62,7 @@
         let currentClappr;
         let canaisRaw = [];
         let isSmartBuffering = false;
-        let objBufferTarget = 30; // Alvo de segundos de folga (30s)
+        let objBufferTarget = 30; 
         
         async function carregarCanaisJSON() {
             try {
@@ -120,8 +104,20 @@
             
             let urlVideo = c.video;
 
+            // ==========================================
+            // LÓGICA DE CONVERSÃO AUTOMÁTICA (TXT -> M3U8)
+            // ==========================================
+            if (urlVideo && urlVideo.includes('file.txt')) {
+                urlVideo = urlVideo
+                    .replace('/embedtv/', '/hls/')
+                    .replace('/nossoplayer/', '/hls/')
+                    .replace('/file.txt', '.m3u8');
+                
+                console.log("Link convertido automaticamente para:", urlVideo);
+            }
+
+            // Agora testa se o link gerado (ou original) é m3u8
             if (urlVideo && urlVideo.includes('.m3u8')) {
-                // Ativa a regra de forçar pausa de imediato
                 isSmartBuffering = true;
                 
                 currentClappr = new Clappr.Player({
@@ -130,11 +126,9 @@
                     plugins: [HlsjsPlayback],
                     width: '100%',
                     height: '100%',
-                    // O player vai tentar iniciar, mas o nosso JS abaixo vai travá-lo
                     autoPlay: true, 
                     playback: {
                         hlsjsConfig: {
-                            // Pede ao servidor os ficheiros de há 60 segundos atrás, para termos de onde construir os 30s de buffer
                             liveSyncDuration: 60, 
                             liveMaxLatencyDuration: 120, 
                             maxBufferLength: 90, 
@@ -145,6 +139,7 @@
                     }
                 });
             } else if (urlVideo) {
+                // Caso falhe a conversão por algum motivo estranho e continue como Iframe
                 p.innerHTML = `<div class="player-wrapper"><div class="click-shield" onclick="this.remove()"></div><iframe src="${urlVideo}" allow="autoplay;fullscreen"></iframe></div>`;
             }
         }
@@ -172,7 +167,7 @@
             });
         }
 
-        // --- MOTOR DE PAUSA INTELIGENTE (SMART BUFFER) ---
+        // Motor de Pausa Inteligente
         setInterval(() => {
             const video = document.querySelector('video');
             const monitor = document.getElementById('buffer-monitor');
@@ -191,33 +186,24 @@
                     let folga = (baixado - atual);
                     if(folga < 0) folga = 0;
 
-                    // 1. LÓGICA DE PAUSA FORÇADA
                     if (isSmartBuffering) {
-                        // Se o vídeo estiver a tentar reproduzir, FORÇA-O A PAUSAR!
-                        if (!video.paused) {
-                            video.pause();
-                        }
+                        if (!video.paused) video.pause();
                         
                         overlay.style.display = "flex";
                         overlayText.innerText = `A Acumular Buffer: ${Math.floor(folga)}s / ${objBufferTarget}s`;
 
-                        // Quando a folga atinge o alvo (ou se a playlist do servidor for demasiado curta e estagnar nos 20s)
                         if (folga >= objBufferTarget || (baixado > 0 && folga > 20 && video.readyState === 4)) {
                             isSmartBuffering = false;
                             overlay.style.display = "none";
-                            video.play(); // Arranca o vídeo de forma segura
+                            video.play(); 
                         }
                     } else {
-                        // 2. LÓGICA DURANTE A REPRODUÇÃO NORMAL
-                        // Se a folga cair perigosamente para menos de 3 segundos, ativa a Pausa Inteligente novamente
                         if (folga < 3 && atual > 0 && !video.paused) {
                             isSmartBuffering = true;
-                            // Reduz ligeiramente o alvo para voltar mais rápido na segunda vez
                             objBufferTarget = 20; 
                         }
                     }
 
-                    // ATUALIZAÇÃO DA CAIXINHA DE DIAGNÓSTICO (CANTO SUPERIOR)
                     if(baixado > 0) {
                         monitor.style.display = "block";
                         let cor = "var(--green)";
@@ -233,7 +219,7 @@
                 monitor.style.display = "none";
                 overlay.style.display = "none";
             }
-        }, 500); // Executa a verificação a cada meio segundo
+        }, 500);
 
         window.onload = () => carregarCanaisJSON();
     </script>
