@@ -1,6 +1,5 @@
 [
   {
-    "horario": "23:59",
     "confronto": "CAZÉ TV",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -8,7 +7,6 @@
     "audio": ""
   },
   {
-    "horario": "23:59",
     "confronto": "ESPN",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -16,7 +14,6 @@
     "audio": ""
   },
   {
-    "horario": "23:59",
     "confronto": "ESPN 2",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -24,7 +21,6 @@
     "audio": ""
   },
   {
-    "horario": "23:59",
     "confronto": "ESPN 3",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -32,7 +28,6 @@
     "audio": ""
   },
   {
-    "horario": "23:59",
     "confronto": "GLOBO",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -40,7 +35,6 @@
     "audio": ""
   },
   {
-    "horario": "23:59",
     "confronto": "GLOBO (Alternativo 1)",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -48,7 +42,6 @@
     "audio": ""
   },
   {
-    "horario": "23:59",
     "confronto": "GLOBO (Alternativo 2)",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -56,7 +49,6 @@
     "audio": ""
   },
   {
-    "horario": "23:59",
     "confronto": "PREMIERE 1",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -64,7 +56,6 @@
     "audio": ""
   },
   {
-    "horario": "23:59",
     "confronto": "PREMIERE 3",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -72,7 +63,6 @@
     "audio": ""
   },
   {
-    "horario": "23:59",
     "confronto": "PREMIERE 4",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -80,7 +70,6 @@
     "audio": ""
   },
   {
-    "horario": "23:59",
     "confronto": "SBT",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -88,7 +77,6 @@
     "audio": ""
   },
   {
-    "horario": "23:59",
     "confronto": "SPORTV",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -96,7 +84,6 @@
     "audio": ""
   },
   {
-    "horario": "23:59",
     "confronto": "SPORTV (Alternativo)",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -104,7 +91,6 @@
     "audio": ""
   },
   {
-    "horario": "23:59",
     "confronto": "SPORTV 2",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -112,7 +98,6 @@
     "audio": ""
   },
   {
-    "horario": "23:59",
     "confronto": "SPORTV 3",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -120,7 +105,6 @@
     "audio": ""
   },
   {
-    "horario": "23:59",
     "confronto": "SPORTV 3 (Alternativo)",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -128,7 +112,6 @@
     "audio": ""
   },
   {
-    "horario": "23:59",
     "confronto": "SPORTV PT 1",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
