@@ -24,6 +24,7 @@
         
         #player-container { width: 100%; height: 100%; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); position: relative; }
         #player, .player-wrapper, iframe { width: 100% !important; height: 100% !important; border: none; display: block; }
+        .click-shield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; cursor: pointer; background: rgba(0,0,0,0.01); }
         
         .brand-container { border-bottom: 1px solid #222; padding: 15px 10px; text-align: center; }
         .nav-header { display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, var(--green), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; font-size: 20px; letter-spacing: 1px; }
@@ -41,13 +42,15 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .progress-text { font-size: 24px; font-weight: bold; color: var(--green); letter-spacing: 1px; }
 
-        #custom-progress-bar { position: absolute; bottom: 30px; left: 0; width: 100%; height: 5px; background: rgba(0, 0, 0, 0.5); z-index: 1000; display: none; }
+        #custom-progress-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 5px; background: rgba(0, 0, 0, 0.5); z-index: 1000; display: none; transition: height 0.2s ease; }
+        #player-container:hover #custom-progress-bar { height: 12px; }
         #bar-buffered { position: absolute; top: 0; left: 0; height: 100%; background: rgba(255, 255, 255, 0.4); width: 0%; transition: width 0.3s linear; }
         #bar-played { position: absolute; top: 0; left: 0; height: 100%; background: var(--green); width: 0%; box-shadow: 0 0 10px var(--green); transition: width 0.3s linear; }
         
-        #time-display { position: absolute; bottom: 8px; left: 10px; right: 10px; display: flex; justify-content: space-between; font-size: 14px; color: var(--green); z-index: 1001; font-family: monospace; display: none; pointer-events: none; }
+        /* Novos estilos para tempo */
+        #time-display { position: absolute; bottom: 15px; left: 10px; right: 10px; display: flex; justify-content: space-between; font-size: 14px; color: var(--green); font-family: monospace; z-index: 1001; pointer-events: none; display: none; }
 
-        @media (max-width: 768px) { .channel-list { margin-bottom: 60px; } body { flex-direction: column; } main { order: 1; height: 35vh; width: 100%; padding: 0; } aside { order: 2; width: 100%; height: 65vh; border-top: 2px solid var(--purple); } }
+        @media (max-width: 768px) { .channel-list { margin-bottom: 60px; } body { flex-direction: column; } main { order: 1; height: 35vh; width: 100%; padding: 0; } aside { order: 2; width: 100%; height: 65vh; border-right: none; border-top: 2px solid var(--purple); } }
     </style>
 </head>
 <body>
@@ -68,6 +71,7 @@
                 <div id="bar-buffered"></div>
                 <div id="bar-played"></div>
             </div>
+
             <div id="time-display">
                 <span id="txt-atual">00:00</span>
                 <span id="txt-baixado">00:00</span>
@@ -84,7 +88,6 @@
         let objBufferTarget = 30; 
         
         function formatTime(s) {
-            if (!s || isNaN(s)) return "00:00";
             let m = Math.floor(s / 60);
             let sec = Math.floor(s % 60);
             return `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
@@ -93,9 +96,10 @@
         async function carregarCanaisJSON() {
             try {
                 const response = await fetch('jogos.json');
+                if (!response.ok) throw new Error('Falha');
                 canaisRaw = await response.json();
                 renderList();
-            } catch (error) { console.error(error); }
+            } catch (error) { document.getElementById('contentList').innerHTML = `<div class="item" style="color:red; text-align:center;">Erro JSON.</div>`; }
         }
 
         function toggleFullScreen(){
@@ -109,7 +113,7 @@
             canaisRaw.forEach((item, idx) => {
                 const div = document.createElement('div');
                 div.className = 'item';
-                div.innerHTML = `<span class="channel-number">${(idx+1).toString().padStart(2,'0')}</span><span>${item.confronto}</span>`;
+                div.innerHTML = `<span class="channel-number">${(idx+1).toString().padStart(2,'0')}</span><span>${item.confronto || "Canal"}</span>`;
                 div.onclick = () => playCanal(item, div);
                 l.appendChild(div);
             });
@@ -118,45 +122,63 @@
         function playCanal(c, el){
             document.querySelectorAll('.item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
-            
-            if(currentClappr){ currentClappr.destroy(); }
-            
+            clearPlayer();
+            const p = document.getElementById('player');
             let urlVideo = c.video;
+
             if (urlVideo && (urlVideo.includes('.m3u8') || urlVideo.includes('.txt'))) {
                 isSmartBuffering = true;
                 currentClappr = new Clappr.Player({
                     source: urlVideo.includes('.txt') ? urlVideo + '?.m3u8' : urlVideo, 
-                    mimeType: 'application/vnd.apple.mpegurl',
+                    mimeType: 'application/vnd.apple.mpegurl', 
                     parentId: "#player",
                     plugins: [HlsjsPlayback],
-                    autoPlay: true,
+                    autoPlay: true, 
                     playback: {
                         hlsjsConfig: {
-                            maxBufferLength: 45,
-                            maxMaxBufferLength: 60,
-                            liveSyncDuration: 30,
-                            lowLatencyMode: false
+                            maxBufferLength: 45, maxMaxBufferLength: 60, maxBufferSize: 60 * 1000 * 1000, 
+                            liveSyncDuration: 30, liveMaxLatencyDuration: 120, lowLatencyMode: false 
                         }
                     }
                 });
             } else {
                 isSmartBuffering = false;
-                document.getElementById('player').innerHTML = `<iframe src="${urlVideo}" allow="autoplay;fullscreen"></iframe>`;
+                p.innerHTML = `<div class="player-wrapper"><div class="click-shield" onclick="this.remove()"></div><iframe src="${urlVideo}" allow="autoplay;fullscreen"></iframe></div>`;
             }
+        }
+
+        function clearPlayer(){
+            if(currentClappr){ currentClappr.destroy(); currentClappr = null; }
+            document.getElementById('smart-buffer-overlay').style.display = "none";
+            document.getElementById('custom-progress-bar').style.display = "none";
+            document.getElementById('time-display').style.display = "none";
+            isSmartBuffering = false;
         }
 
         setInterval(() => {
             const video = document.querySelector('video');
+            const overlay = document.getElementById('smart-buffer-overlay');
+            const progressBar = document.getElementById('custom-progress-bar');
+            
             if (video && currentClappr) {
                 let atual = video.currentTime;
                 let baixado = (video.buffered.length > 0) ? video.buffered.end(video.buffered.length - 1) : 0;
                 
                 document.getElementById('txt-atual').innerText = formatTime(atual);
                 document.getElementById('txt-baixado').innerText = formatTime(baixado);
-                
-                document.getElementById('custom-progress-bar').style.display = "block";
                 document.getElementById('time-display').style.display = "flex";
 
+                if (isSmartBuffering) {
+                    overlay.style.display = "flex";
+                    let folga = (baixado - atual);
+                    let percent = Math.min(100, Math.round((folga / objBufferTarget) * 100));
+                    document.getElementById('overlay-text').innerText = `Carregando ${percent}%`;
+                    if (folga >= objBufferTarget || (baixado > 0 && folga > 20 && video.readyState === 4)) {
+                        isSmartBuffering = false; overlay.style.display = "none"; video.play(); 
+                    }
+                }
+
+                progressBar.style.display = "block";
                 let duracao = video.duration;
                 if (duracao && duracao !== Infinity) {
                     document.getElementById('bar-buffered').style.width = (baixado / duracao * 100) + "%";
