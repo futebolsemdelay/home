@@ -84,10 +84,52 @@
     "audio": ""
   },
   {
+    "confronto": "DISCOVERY CHANNEL",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/77722d433ec7a16963187838c032e71e/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "DISCOVERY H & H",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/c25af16f2c59f3ea6b45631fbdc001d5/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "DISCOVERY ID",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/a453965d4b38d3882fc7ccbec984e8f6/file.txt",
+    "audio": ""
+  },
+  {
     "confronto": "DISCOVERY KIDS",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
     "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/15142f964eccae7a16f4c3bf38d561b9/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "DISCOVERY SCIENCE",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/f09752451d246ea0d49e097bf4994dab/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "DISCOVERY TURBO",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/496ae98d214627f304df59d26e2f5b06/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "DISCOVERY WORLD",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/f14b148b7c328bfd3258e9313abbc73d/file.txt",
     "audio": ""
   },
   {
@@ -172,6 +214,20 @@
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
     "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/44fe6cf6557a44023b2730739ccd9d0c/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "HISTORY",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/3391bdd12605ccba3fac9bf1e5093da6/file.txt",
+    "audio": ""
+  },
+   {
+    "confronto": "HISTORY 2",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/a1a3572dc466edfa70631cf5675079ab/file.txt",
     "audio": ""
   },
   {
