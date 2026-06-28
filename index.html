@@ -15,50 +15,63 @@
         :root { --bg: #111; --sidebar-bg: #151515; --purple: #8a2be2; --green: #00ff88; --text: #ffffff; }
         body { background-color: var(--bg); color: var(--text); font-family: 'Rajdhani', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
+        /* Scrollbar */
         ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #111; }
         ::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 10px; }
         
-        aside { width: 320px; background: var(--sidebar-bg); border-right: 1px solid rgba(138,43,226,0.3); display: flex; flex-direction: column; flex-shrink: 0; }
-        main { flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 20px; background: radial-gradient(circle, #1a1a1a 0%, #111 100%); position: relative; }
+        /* Layout Principal */
+        aside { width: 320px; background: var(--sidebar-bg); border-right: 1px solid rgba(138,43,226,0.3); display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+        main { flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 20px; background: radial-gradient(circle, #1a1a1a 0%, #111 100%); }
         
-        #player-container { width: 100%; height: 100%; background: #000; border-radius: 12px; overflow: hidden; position: relative; }
-        #player { width: 100%; height: 100%; }
+        /* Contêiner do Player e Elementos Internos */
+        #player-container { width: 100%; height: 100%; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); position: relative; }
+        #player, .player-wrapper, iframe { width: 100% !important; height: 100% !important; border: none; display: block; }
+        .click-shield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; cursor: pointer; background: rgba(0,0,0,0.01); }
         
-        /* Menu e Listagem */
+        /* Menu Lateral */
         .brand-container { border-bottom: 1px solid #222; padding: 15px 10px; text-align: center; }
-        .nav-header { background: linear-gradient(90deg, var(--green), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; font-size: 20px; }
+        .nav-header { display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, var(--green), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; font-size: 20px; letter-spacing: 1px; }
+        .search-box { padding: 15px; }
+        .search-box input { width: 90%; background: #000; border: 1px solid #333; padding: 12px; color: var(--green); border-radius: 8px; outline: none; font-family: 'Rajdhani'; }
         .channel-list { overflow-y: auto; flex-grow: 1; }
-        .item { padding: 12px 15px; margin: 5px 10px; background: #1a1a1a; border-radius: 8px; cursor: pointer; display: flex; align-items: center; }
-        .item.active { border-left: 4px solid var(--green); background: rgba(138,43,226,0.15); color: var(--green); }
-
-        /* Barra de Progresso e Tempos */
-        #custom-progress-bar { position: absolute; bottom: 30px; left: 0; width: 100%; height: 8px; background: rgba(0,0,0,0.5); z-index: 1000; }
-        #bar-buffered { position: absolute; top: 0; left: 0; height: 100%; background: rgba(255, 255, 255, 0.3); width: 0%; }
-        #bar-played { position: absolute; top: 0; left: 0; height: 100%; background: var(--green); width: 0%; box-shadow: 0 0 10px var(--green); }
         
-        #time-display { position: absolute; bottom: 5px; left: 10px; right: 10px; display: flex; justify-content: space-between; font-size: 13px; color: #fff; z-index: 1001; font-family: monospace; }
+        /* Itens da Lista */
+        .item { padding: 12px 15px; margin: 5px 10px; background: #1a1a1a; border-radius: 8px; display: flex; align-items: center; font-size: 16px; font-weight: 600; cursor: pointer; border-left: 4px solid transparent; user-select: none; transition: 0.2s; }
+        .item:hover { background: #222; transform: translateX(5px); }
+        .item.active { border-left-color: var(--green); background: rgba(138,43,226,0.15); color: var(--green); }
+        .channel-number { min-width: 30px; font-size: 11px; color: var(--purple); margin-right: 12px; background: #000; padding: 2px 6px; border-radius: 4px; text-align: center; }
         
-        #smart-buffer-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        .spinner { width: 40px; height: 40px; border: 4px solid var(--purple); border-top-color: var(--green); border-radius: 50%; animation: spin 1s linear infinite; }
+        /* Overlays e Monitores */
+        #smart-buffer-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-family: 'Rajdhani', sans-serif; }
+        .spinner { width: 50px; height: 50px; border: 5px solid rgba(138,43,226,0.3); border-top-color: var(--green); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .progress-text { font-size: 24px; font-weight: bold; color: var(--green); letter-spacing: 1px; }
 
-        @media (max-width: 768px) { body { flex-direction: column; } main { height: 35vh; } aside { height: 65vh; } }
+        /* Barra de Progresso e Tempos (Estilo VLC) */
+        #custom-progress-bar { position: absolute; bottom: 30px; left: 0; width: 100%; height: 5px; background: rgba(0, 0, 0, 0.5); z-index: 1000; display: none; }
+        #bar-buffered { position: absolute; top: 0; left: 0; height: 100%; background: rgba(255, 255, 255, 0.4); width: 0%; transition: width 0.3s linear; }
+        #bar-played { position: absolute; top: 0; left: 0; height: 100%; background: var(--green); width: 0%; box-shadow: 0 0 10px var(--green); transition: width 0.3s linear; }
+        
+        #time-display { position: absolute; bottom: 8px; left: 10px; right: 10px; display: flex; justify-content: space-between; font-size: 14px; color: var(--green); z-index: 1001; font-family: monospace; display: none; pointer-events: none; }
+
+        /* Responsividade */
+        @media (max-width: 768px) { .channel-list { margin-bottom: 60px; } body { flex-direction: column; } main { order: 1; height: 35vh; width: 100%; padding: 0; } aside { order: 2; width: 100%; height: 65vh; border-right: none; border-top: 2px solid var(--purple); } }
     </style>
 </head>
 <body>
     <aside>
-        <div class="brand-container"><div class="nav-header">CANAIS DE TV</div></div>
+        <div class="brand-container"><div class="nav-header"><span>CANAIS DE TV</span></div></div>
+        <div class="search-box"><input type="text" id="filter" placeholder="🔍 Buscar canal..." onkeyup="filterList()"></div>
         <div class="channel-list" id="contentList"></div>
     </aside>
     
     <main>
-        <div id="player-container">
+        <div id="player-container" ondblclick="toggleFullScreen()">
             <div id="smart-buffer-overlay">
                 <div class="spinner"></div>
-                <div style="margin-top:10px; color:var(--green);" id="overlay-text">Carregando...</div>
+                <div class="progress-text" id="overlay-text">Carregando 0%</div>
             </div>
-            
-            <div id="player"></div>
             
             <div id="custom-progress-bar">
                 <div id="bar-buffered"></div>
@@ -68,13 +81,17 @@
                 <span id="txt-atual">00:00</span>
                 <span id="txt-baixado">00:00</span>
             </div>
+            
+            <div id="player"></div>
         </div>
     </main>
 
     <script>
         let currentClappr;
+        let canaisRaw = [];
         let isSmartBuffering = false;
-
+        let objBufferTarget = 30; 
+        
         function formatTime(s) {
             if (!s || isNaN(s)) return "00:00";
             let m = Math.floor(s / 60);
@@ -84,44 +101,108 @@
 
         async function carregarCanaisJSON() {
             try {
-                const res = await fetch('jogos.json');
-                const data = await res.json();
-                const l = document.getElementById('contentList');
-                data.forEach((item, idx) => {
-                    const div = document.createElement('div');
-                    div.className = 'item';
-                    div.innerHTML = `<span>${item.confronto}</span>`;
-                    div.onclick = () => {
-                        document.querySelectorAll('.item').forEach(i => i.classList.remove('active'));
-                        div.classList.add('active');
-                        playCanal(item);
-                    };
-                    l.appendChild(div);
-                });
-            } catch (e) { console.error(e); }
+                const response = await fetch('jogos.json');
+                if (!response.ok) throw new Error('Falha ao carregar o JSON');
+                canaisRaw = await response.json();
+                renderList();
+            } catch (error) {
+                document.getElementById('contentList').innerHTML = `<div class="item" style="color:red; text-align:center;">Erro ao carregar 'jogos.json'.</div>`;
+            }
         }
 
-        function playCanal(c) {
-            if(currentClappr) currentClappr.destroy();
-            currentClappr = new Clappr.Player({
-                source: c.video,
-                parentId: "#player",
-                plugins: [HlsjsPlayback],
-                autoPlay: true,
-                playback: { hlsjsConfig: { maxBufferLength: 45 } }
+        function toggleFullScreen(){
+            const c = document.getElementById('player-container');
+            if(!document.fullscreenElement) c.requestFullscreen();
+            else document.exitFullscreen();
+        }
+
+        function renderList(){
+            const l = document.getElementById('contentList');
+            l.innerHTML = "";
+            canaisRaw.forEach((item, idx) => {
+                const div = document.createElement('div');
+                div.className = 'item';
+                const num = (idx+1).toString().padStart(2,'0');
+                div.innerHTML = `<span class="channel-number">${num}</span><span>${item.confronto || "Canal"}</span>`;
+                div.onclick = () => playCanal(item, div);
+                l.appendChild(div);
+            });
+        }
+
+        function playCanal(c, el){
+            updateActive(el);
+            clearPlayer();
+            const urlVideo = c.video;
+
+            if (urlVideo && (urlVideo.includes('.m3u8') || urlVideo.includes('.txt'))) {
+                isSmartBuffering = true;
+                objBufferTarget = 30; 
+                currentClappr = new Clappr.Player({
+                    source: urlVideo.includes('.txt') ? urlVideo + '?.m3u8' : urlVideo, 
+                    parentId: "#player",
+                    plugins: [HlsjsPlayback],
+                    autoPlay: true, 
+                    playback: { hlsjsConfig: { maxBufferLength: 45 } }
+                });
+            } else if (urlVideo) {
+                isSmartBuffering = false;
+                document.getElementById('player').innerHTML = `<iframe src="${urlVideo}" allow="autoplay;fullscreen"></iframe>`;
+            }
+        }
+
+        function clearPlayer(){
+            if(currentClappr){ currentClappr.destroy(); currentClappr = null; }
+            document.getElementById('smart-buffer-overlay').style.display = "none";
+            document.getElementById('custom-progress-bar').style.display = "none";
+            document.getElementById('time-display').style.display = "none";
+            isSmartBuffering = false;
+        }
+
+        function updateActive(el){
+            document.querySelectorAll('.item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function filterList(){
+            let v = document.getElementById('filter').value.toLowerCase();
+            document.querySelectorAll('.item').forEach(el => {
+                el.style.display = el.innerText.toLowerCase().includes(v) ? 'flex' : 'none';
             });
         }
 
         setInterval(() => {
             const video = document.querySelector('video');
-            if (video) {
+            const overlay = document.getElementById('smart-buffer-overlay');
+            const overlayText = document.getElementById('overlay-text');
+            const progressBar = document.getElementById('custom-progress-bar');
+            const timeDisplay = document.getElementById('time-display');
+            
+            if (video && currentClappr) {
                 let atual = video.currentTime;
                 let baixado = (video.buffered.length > 0) ? video.buffered.end(video.buffered.length - 1) : 0;
-                let duracao = video.duration;
-
+                let folga = (baixado - atual);
+                
                 document.getElementById('txt-atual').innerText = formatTime(atual);
                 document.getElementById('txt-baixado').innerText = formatTime(baixado);
 
+                if (isSmartBuffering) {
+                    if (!video.paused) video.pause();
+                    overlay.style.display = "flex";
+                    let percent = Math.min(100, Math.round((folga / objBufferTarget) * 100));
+                    overlayText.innerText = `Carregando ${percent}%`;
+                    if (folga >= objBufferTarget || (baixado > 0 && folga > 20 && video.readyState === 4)) {
+                        isSmartBuffering = false;
+                        overlay.style.display = "none";
+                        video.play(); 
+                    }
+                } else if (folga < 3 && atual > 0 && !video.paused) {
+                    isSmartBuffering = true;
+                    objBufferTarget = 20; 
+                }
+
+                progressBar.style.display = "block";
+                timeDisplay.style.display = "flex";
+                let duracao = video.duration;
                 if (duracao && duracao !== Infinity) {
                     document.getElementById('bar-buffered').style.width = (baixado / duracao * 100) + "%";
                     document.getElementById('bar-played').style.width = (atual / duracao * 100) + "%";
@@ -129,7 +210,7 @@
             }
         }, 500);
 
-        window.onload = carregarCanaisJSON;
+        window.onload = () => carregarCanaisJSON();
     </script>
 </body>
 </html>
