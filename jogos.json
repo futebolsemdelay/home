@@ -147,6 +147,13 @@
     "audio": ""
   },
   {
+    "confronto": "PREMIERE 2",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/3abc2f38dce64c5f69ea487309b27c89/file.txt",
+    "audio": ""
+  },
+  {
     "confronto": "PREMIERE 3",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -158,6 +165,27 @@
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
     "video": "https://b62e8626ca7f5d5c9abfa7faf04644e5.croudfront.lat/nossoplayer/35db54d6621a8b3c3ca830fb3d98e4fb/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "PREMIERE 5",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/f62cedfb4c5db02bbc07b729cfcf58d5/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "PREMIERE 6",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/9d8a2cda57455695e56296a5f2304e72/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "PRIME VIDEO 1",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/083bae2198d8632e3b15e5d4219e8c16/file.txt",
     "audio": ""
   },
   {
@@ -256,6 +284,13 @@
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
     "video": "https://c0f971d8cd24364f2029fcb9ac7b71f5.croudfront.lat/embedtv/d0a00d36fe4a400aadf9b318b1f9ebc5/file.txt",
+    "audio": ""
+  }
+  {
+    "confronto": "X SPORTS",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/0b1b08875b792c382ee4b1143d15cc7b/file.txt",
     "audio": ""
   }
 ]
