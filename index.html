@@ -8,6 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@clappr/hlsjs-playback@latest/dist/hlsjs-playback.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    
     <style>
         :root { --bg: #111; --sidebar-bg: #151515; --purple: #8a2be2; --green: #00ff88; --text: #ffffff; }
         body { background-color: var(--bg); color: var(--text); font-family: 'Rajdhani', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
@@ -58,6 +59,7 @@
             <div id="player"></div>
         </div>
     </main>
+
     <script>
         let currentClappr;
         let canaisRaw = [];
@@ -104,9 +106,10 @@
             
             let urlVideo = c.video;
 
-            // Se for um link M3U8 limpo (sem bloqueios), usa o Clappr e o Smart Buffer
+            // Usa o Clappr se for link de vídeo direto (M3U8)
             if (urlVideo && urlVideo.includes('.m3u8')) {
                 isSmartBuffering = true;
+                objBufferTarget = 30; // Alvo de 30 segundos
                 
                 currentClappr = new Clappr.Player({
                     source: urlVideo,
@@ -117,17 +120,26 @@
                     autoPlay: true, 
                     playback: {
                         hlsjsConfig: {
-                            liveSyncDuration: 60, 
+                            maxBufferLength: 45, 
+                            maxMaxBufferLength: 60, 
+                            maxBufferSize: 60 * 1000 * 1000, 
+                            liveSyncDuration: 30, 
                             liveMaxLatencyDuration: 120, 
-                            maxBufferLength: 90, 
-                            maxMaxBufferLength: 120, 
                             fragLoadingTimeOut: 30000,
-                            manifestLoadingTimeOut: 30000
+                            manifestLoadingTimeOut: 30000,
+                            lowLatencyMode: false 
+                        }
+                    },
+                    events: {
+                        onReady: function() {
+                            // Garante que o vídeo inicie pausado para o seu motor de buffer agir
+                            const videoTag = document.querySelector('video');
+                            if(videoTag) videoTag.pause();
                         }
                     }
                 });
             } else if (urlVideo) {
-                // Se for um link de Iframe (.txt), remove o overlay/monitor e exibe normalmente
+                // Se for um link de Iframe, remove o overlay/monitor e exibe normalmente (Buffer não controlável)
                 isSmartBuffering = false;
                 p.innerHTML = `<div class="player-wrapper"><div class="click-shield" onclick="this.remove()"></div><iframe src="${urlVideo}" allow="autoplay;fullscreen"></iframe></div>`;
             }
@@ -189,7 +201,7 @@
                     } else {
                         if (folga < 3 && atual > 0 && !video.paused) {
                             isSmartBuffering = true;
-                            objBufferTarget = 20; 
+                            objBufferTarget = 20; // Reduz a meta no re-buffer para não irritar muito o usuário
                         }
                     }
 
