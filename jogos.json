@@ -330,10 +330,24 @@
     "audio": ""
   },
   {
+    "confronto": "MEGAPIX",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/506d9c15bd60bae9e743ae37783c2350/file.txt",
+    "audio": ""
+  },
+  {
     "confronto": "NARUTO CLASSIC 24H",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
     "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/7dcc07b4bcac52f94402936213ab2a3f/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "OFF",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/db8eb7d6c95d97a280b2a08157442895/file.txt",
     "audio": ""
   },
   {
@@ -415,6 +429,27 @@
     "audio": ""
   },
   {
+    "confronto": "SONY CHANNEL",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/4a512d2aaac8c34215158146d2c25bca/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "SPACE",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/60671f87dc8173bc27e16bbed1c821c3/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "STUDIO UNIVERSAL",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/2fffe3d82b1007b26b4f8800cbf0d6bb/file.txt",
+    "audio": ""
+  },
+  {
     "confronto": "SPORTV",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
@@ -485,10 +520,108 @@
     "audio": ""
   },
   {
+    "confronto": "TCM",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/5e2b653754e533829c96649b620c0d45/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "TELECINE ACTION",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/9e4ea91868ea4e8fc3a2356f024ce7b4/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "TELECINE ACTION",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/9e4ea91868ea4e8fc3a2356f024ce7b4/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "TELECINE CULT",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/5b405dc13955df5e7b172e6a0870a1df/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "TELECINE FUN",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/d4c98b7f00d8ce97e968e981079c92ff/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "TELECINE PIPOCA",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/2c0f13c7701242c218c0fc59e83ba699/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "TELECINE PREMIUM",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/1c5d97c7323aa80625182da6214a0155/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "TELECINE TOUCH",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/9e5142fde48d2cf0878a516d088dd2ae/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "TLC",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/7711ec2bbd5e0ed4b27ce9f8c8605841/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "TNT",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/697264ad249f4df5a18d9cc3c438a5cb/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "TNT NOVELAS",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/0d45e9419b009b1c89fccb1a9cc26e0d/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "TNT SERIES",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/cafa8c38874b29608725c3f5d61d8929/file.txt",
+    "audio": ""
+  },
+  {
     "confronto": "TM ODEIA O CHRIS 24H",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
     "video": "https://c0f971d8cd24364f2029fcb9ac7b71f5.croudfront.lat/embedtv/d0a00d36fe4a400aadf9b318b1f9ebc5/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "UNIVERSAL TV",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/4392308f60798b0c003387360c472315/file.txt",
+    "audio": ""
+  },
+  {
+    "confronto": "WARNER CHANNEL",
+    "esporte": "TV",
+    "empresa": "CLOUDFRONT",
+    "video": "https://9e82757e9a1c12cb710ad680db11f6f1.croudfront.lat/embedtv/00c9e1b01a3354bd77087659a47ae5a9/file.txt",
     "audio": ""
   },
   {
