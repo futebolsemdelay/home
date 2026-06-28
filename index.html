@@ -47,8 +47,7 @@
         #smart-buffer-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-family: 'Rajdhani', sans-serif; }
         .spinner { width: 50px; height: 50px; border: 5px solid rgba(138,43,226,0.3); border-top-color: var(--green); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .progress-text { font-size: 24px; font-weight: bold; color: var(--green); }
-        .progress-sub { font-size: 16px; color: #aaa; margin-top: 5px; }
+        .progress-text { font-size: 24px; font-weight: bold; color: var(--green); letter-spacing: 1px; }
 
         /* Barra de Progresso Customizada (Estilo VLC/YouTube) */
         #custom-progress-bar {
@@ -99,11 +98,10 @@
     <main>
         <div id="player-container" ondblclick="toggleFullScreen()">
             
-            <div id="buffer-monitor">Aguardando...</div>
+            <div id="buffer-monitor"></div>
             <div id="smart-buffer-overlay">
                 <div class="spinner"></div>
-                <div class="progress-text" id="overlay-text">A Acumular Buffer: 0s / 30s</div>
-                <div class="progress-sub">Preparando a transmissão...</div>
+                <div class="progress-text" id="overlay-text">Carregando 0%</div>
             </div>
             
             <div id="custom-progress-bar">
@@ -165,20 +163,18 @@
             const p = document.getElementById('player');
             let urlVideo = c.video;
 
-            // Lógica para links .m3u8 E .txt disfarçados
             if (urlVideo && (urlVideo.includes('.m3u8') || urlVideo.includes('.txt'))) {
                 isSmartBuffering = true;
                 objBufferTarget = 30; 
                 
-                // O TRUQUE: Adiciona ?.m3u8 no final se for um txt para enganar o hls.js
                 let urlMascarada = urlVideo;
                 if (urlVideo.includes('.txt') && !urlVideo.includes('.m3u8')) {
                     urlMascarada = urlVideo + '?.m3u8';
                 }
                 
                 currentClappr = new Clappr.Player({
-                    source: urlMascarada, // Passa a URL enganosa
-                    mimeType: 'application/vnd.apple.mpegurl', // Força o tipo HLS
+                    source: urlMascarada, 
+                    mimeType: 'application/vnd.apple.mpegurl', 
                     parentId: "#player",
                     plugins: [HlsjsPlayback],
                     width: '100%',
@@ -204,7 +200,6 @@
                     }
                 });
             } else if (urlVideo) {
-                // Se for página de Embed/Iframe que não é .txt nem .m3u8
                 isSmartBuffering = false;
                 p.innerHTML = `<div class="player-wrapper"><div class="click-shield" onclick="this.remove()"></div><iframe src="${urlVideo}" allow="autoplay;fullscreen"></iframe></div>`;
             }
@@ -258,12 +253,15 @@
                     let folga = (baixado - atual);
                     if(folga < 0) folga = 0;
 
-                    // Gestão do Overlay de Carregamento
+                    // Gestão do Overlay de Carregamento em Porcentagem
                     if (isSmartBuffering) {
                         if (!video.paused) video.pause();
                         
                         overlay.style.display = "flex";
-                        overlayText.innerText = `A Acumular Buffer: ${Math.floor(folga)}s / ${objBufferTarget}s`;
+                        
+                        // Calcula a porcentagem com base no tempo de folga e o alvo
+                        let percent = Math.min(100, Math.round((folga / objBufferTarget) * 100));
+                        overlayText.innerText = `Carregando ${percent}%`;
 
                         if (folga >= objBufferTarget || (baixado > 0 && folga > 20 && video.readyState === 4)) {
                             isSmartBuffering = false;
@@ -277,7 +275,7 @@
                         }
                     }
 
-                    // Gestão do Monitor Textual Superior
+                    // Gestão do Monitor Textual Superior (mantive para debugar rede, se não quiser apague essa parte)
                     if(baixado > 0) {
                         monitor.style.display = "block";
                         let cor = "var(--green)";
