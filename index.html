@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Canais de TV</title>
+    <title>Canais de TV - Smart Buffer</title>
     <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@clappr/hlsjs-playback@latest/dist/hlsjs-playback.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
@@ -31,59 +31,63 @@
         .item.active { border-left-color: var(--green); background: rgba(138,43,226,0.15); color: var(--green); }
         .channel-number { min-width: 30px; font-size: 11px; color: var(--purple); margin-right: 12px; background: #000; padding: 2px 6px; border-radius: 4px; text-align: center; }
         
-        /* Estilo da Caixinha do Monitor de Buffer */
+        /* Monitor de Diagnóstico */
         #buffer-monitor {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: rgba(0, 0, 0, 0.8);
-            color: var(--green);
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: bold;
-            z-index: 1000;
-            display: none; /* Oculto por padrão, aparece quando começa a tocar .m3u8 */
-            pointer-events: none;
-            border: 1px solid #333;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            position: absolute; top: 15px; left: 15px; background: rgba(0, 0, 0, 0.8);
+            color: var(--green); padding: 8px 12px; border-radius: 6px; font-size: 14px;
+            font-weight: bold; z-index: 1000; display: none; pointer-events: none;
+            border: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
+
+        /* Ecrã de Carregamento Forçado (Smart Buffering) */
+        #smart-buffer-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); z-index: 2000; display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+            color: #fff; font-family: 'Rajdhani', sans-serif;
+        }
+        .spinner { width: 50px; height: 50px; border: 5px solid rgba(138,43,226,0.3); border-top-color: var(--green); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .progress-text { font-size: 24px; font-weight: bold; color: var(--green); }
+        .progress-sub { font-size: 16px; color: #aaa; margin-top: 5px; }
 
         @media (max-width: 768px) { body { flex-direction: column; } main { order: 1; height: 35vh; width: 100%; padding: 0; } aside { order: 2; width: 100%; height: 65vh; border-right: none; border-top: 2px solid var(--purple); } }
     </style>
 </head>
 <body>
     <aside>
-        <div class="brand-container">
-            <div class="nav-header">
-                <span>CANAIS DE TV</span>
-            </div>
-        </div>
-        <div class="search-box">
-            <input type="text" id="filter" placeholder="🔍 Buscar canal..." onkeyup="filterList()">
-        </div>
+        <div class="brand-container"><div class="nav-header"><span>CANAIS DE TV</span></div></div>
+        <div class="search-box"><input type="text" id="filter" placeholder="🔍 Buscar canal..." onkeyup="filterList()"></div>
         <div class="channel-list" id="contentList"></div>
     </aside>
     <main>
         <div id="player-container" ondblclick="toggleFullScreen()">
-            <div id="buffer-monitor">Aguardando vídeo...</div>
+            
+            <div id="buffer-monitor">Aguardando...</div>
+            
+            <div id="smart-buffer-overlay">
+                <div class="spinner"></div>
+                <div class="progress-text" id="overlay-text">A Acumular Buffer: 0s / 30s</div>
+                <div class="progress-sub">Para garantir que a transmissão não trava...</div>
+            </div>
+
             <div id="player"></div>
         </div>
     </main>
     <script>
         let currentClappr;
         let canaisRaw = [];
+        let isSmartBuffering = false;
+        let objBufferTarget = 30; // Alvo de segundos de folga (30s)
         
         async function carregarCanaisJSON() {
             try {
                 const response = await fetch('jogos.json');
                 if (!response.ok) throw new Error('Falha ao carregar o JSON');
-                
                 canaisRaw = await response.json();
                 renderList();
             } catch (error) {
-                console.error("Erro ao carregar jogos.json:", error);
-                document.getElementById('contentList').innerHTML = `<div class="item" style="color:red; text-align:center; font-size:14px; display:block;">Erro ao carregar 'jogos.json'. Verifique se o servidor local está ativo.</div>`;
+                document.getElementById('contentList').innerHTML = `<div class="item" style="color:red; text-align:center;">Erro ao carregar 'jogos.json'.</div>`;
             }
         }
 
@@ -96,12 +100,10 @@
         function renderList(){
             const l = document.getElementById('contentList');
             l.innerHTML = "";
-            
             canaisRaw.forEach((item, idx) => {
                 const div = document.createElement('div');
                 div.className = 'item';
                 const num = (idx+1).toString().padStart(2,'0');
-                
                 const tituloFormatado = item.confronto ? item.confronto : "Canal Desconhecido";
                 
                 div.innerHTML = `<span class="channel-number">${num}</span><span>${tituloFormatado}</span>`;
@@ -119,19 +121,23 @@
             let urlVideo = c.video;
 
             if (urlVideo && urlVideo.includes('.m3u8')) {
+                // Ativa a regra de forçar pausa de imediato
+                isSmartBuffering = true;
+                
                 currentClappr = new Clappr.Player({
                     source: urlVideo,
                     parentId: "#player",
                     plugins: [HlsjsPlayback],
                     width: '100%',
                     height: '100%',
-                    autoPlay: true,
+                    // O player vai tentar iniciar, mas o nosso JS abaixo vai travá-lo
+                    autoPlay: true, 
                     playback: {
                         hlsjsConfig: {
-                            // CONFIGURAÇÕES AGRESSIVAS DE ANTI-TRAVAMENTO
-                            liveSyncDuration: 60, // Fica 60 segundos atrás do ao vivo real
-                            liveMaxLatencyDuration: 120, // Tolera até 2 minutos de atraso sem travar
-                            maxBufferLength: 90, // Tenta manter 90 segundos de vídeo já baixados
+                            // Pede ao servidor os ficheiros de há 60 segundos atrás, para termos de onde construir os 30s de buffer
+                            liveSyncDuration: 60, 
+                            liveMaxLatencyDuration: 120, 
+                            maxBufferLength: 90, 
                             maxMaxBufferLength: 120, 
                             fragLoadingTimeOut: 30000,
                             manifestLoadingTimeOut: 30000
@@ -150,12 +156,13 @@
             }
             document.getElementById('player').innerHTML = "";
             document.getElementById('buffer-monitor').style.display = "none";
+            document.getElementById('smart-buffer-overlay').style.display = "none";
+            isSmartBuffering = false;
         }
 
         function updateActive(el){
             document.querySelectorAll('.item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
-            if(window.innerWidth <= 768) window.scrollTo({top:0, behavior:'smooth'});
         }
 
         function filterList(){
@@ -165,44 +172,70 @@
             });
         }
 
-        // Script que atualiza o Monitor de Buffer a cada segundo
+        // --- MOTOR DE PAUSA INTELIGENTE (SMART BUFFER) ---
         setInterval(() => {
             const video = document.querySelector('video');
             const monitor = document.getElementById('buffer-monitor');
+            const overlay = document.getElementById('smart-buffer-overlay');
+            const overlayText = document.getElementById('overlay-text');
             
-            // Só executa se existir um vídeo tocando e se o Clappr estiver ativo (evita Iframes)
-            if (video && currentClappr && !video.paused) {
+            if (video && currentClappr) {
                 try {
                     let atual = video.currentTime;
                     let baixado = 0;
                     
-                    // Pega o ponto mais distante de vídeo que já foi baixado na memória
                     if (video.buffered.length > 0) {
                         baixado = video.buffered.end(video.buffered.length - 1);
                     }
                     
-                    let folga = (baixado - atual).toFixed(1);
-                    
+                    let folga = (baixado - atual);
+                    if(folga < 0) folga = 0;
+
+                    // 1. LÓGICA DE PAUSA FORÇADA
+                    if (isSmartBuffering) {
+                        // Se o vídeo estiver a tentar reproduzir, FORÇA-O A PAUSAR!
+                        if (!video.paused) {
+                            video.pause();
+                        }
+                        
+                        overlay.style.display = "flex";
+                        overlayText.innerText = `A Acumular Buffer: ${Math.floor(folga)}s / ${objBufferTarget}s`;
+
+                        // Quando a folga atinge o alvo (ou se a playlist do servidor for demasiado curta e estagnar nos 20s)
+                        if (folga >= objBufferTarget || (baixado > 0 && folga > 20 && video.readyState === 4)) {
+                            isSmartBuffering = false;
+                            overlay.style.display = "none";
+                            video.play(); // Arranca o vídeo de forma segura
+                        }
+                    } else {
+                        // 2. LÓGICA DURANTE A REPRODUÇÃO NORMAL
+                        // Se a folga cair perigosamente para menos de 3 segundos, ativa a Pausa Inteligente novamente
+                        if (folga < 3 && atual > 0 && !video.paused) {
+                            isSmartBuffering = true;
+                            // Reduz ligeiramente o alvo para voltar mais rápido na segunda vez
+                            objBufferTarget = 20; 
+                        }
+                    }
+
+                    // ATUALIZAÇÃO DA CAIXINHA DE DIAGNÓSTICO (CANTO SUPERIOR)
                     if(baixado > 0) {
                         monitor.style.display = "block";
-                        
-                        // Muda a cor dependendo da segurança da folga
-                        let cor = "var(--green)"; // Seguro (Muito buffer)
-                        if(folga < 10) cor = "orange"; // Atenção
-                        if(folga < 3) cor = "red"; // Vai travar!
+                        let cor = "var(--green)";
+                        if(folga < 15) cor = "orange";
+                        if(folga < 5) cor = "red";
 
                         monitor.style.color = cor;
-                        monitor.innerHTML = `⏱ Atual: ${Math.floor(atual)}s &nbsp;|&nbsp; 📥 Baixado: ${Math.floor(baixado)}s &nbsp;|&nbsp; 🟢 Folga: ${folga}s`;
+                        monitor.innerHTML = `⏱ Atual: ${Math.floor(atual)}s &nbsp;|&nbsp; 📥 Baixado: ${Math.floor(baixado)}s &nbsp;|&nbsp; 🟢 Folga: ${folga.toFixed(1)}s`;
                     }
+
                 } catch(e) {}
             } else if (monitor) {
                 monitor.style.display = "none";
+                overlay.style.display = "none";
             }
-        }, 1000);
+        }, 500); // Executa a verificação a cada meio segundo
 
-        window.onload = () => {
-            carregarCanaisJSON();
-        };
+        window.onload = () => carregarCanaisJSON();
     </script>
 </body>
 </html>
