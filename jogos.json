@@ -27,22 +27,16 @@
     "video": "https://b62e8626ca7f5d5c9abfa7faf04644e5.croudfront.lat/nossoplayer/45a6d2bb4308d109fb0b85312c7f7064/file.txt",
     "audio": ""
   },
+  
   {
-    "confronto": "GLOBO",
-    "esporte": "TV",
-    "empresa": "CLOUDFRONT",
-    "video": "https://b62e8626ca7f5d5c9abfa7faf04644e5.croudfront.lat/nossoplayer/4cf14ceef98bbcad6e1d09e3d928be10/file.txt",
-    "audio": ""
-  },
-  {
-    "confronto": "GLOBO (Alternativo 1)",
+    "confronto": "GLOBO (Alternativo )",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
     "video": "https://c0f971d8cd24364f2029fcb9ac7b71f5.croudfront.lat/embedtv/d3c6a03b3a7890ce68ca46eb1f296461/file.txt",
     "audio": ""
   },
   {
-    "confronto": "GLOBO (Alternativo 2)",
+    "confronto": "GLOBO (Alternativo)",
     "esporte": "TV",
     "empresa": "CLOUDFRONT",
     "video": "https://b62e8626ca7f5d5c9abfa7faf04644e5.croudfront.lat/nossoplayer/4cf14ceef98bbcad6e1d09e3d928be10/file.txt",
