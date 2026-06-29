@@ -51,12 +51,23 @@
         
         #time-display { position: absolute; top: 4px; left: 10px; right: 10px; display: flex; justify-content: space-between; font-size: 14px; color: #fff; font-family: monospace; z-index: 1001; pointer-events: none; transition: opacity 1s ease; opacity: 0; }
 
-        @media (max-width: 768px) { .channel-list { margin-bottom: 60px; } body { flex-direction: column; } main { order: 1; height: 35vh; width: 100%; padding: 0; } aside { order: 2; width: 100%; height: 65vh; border-right: none; border-top: 2px solid var(--purple); } }
+        
+.categoria-header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.cat-btn{width:34px;height:34px;border:none;border-radius:50%;background:#222;color:#00ff88;cursor:pointer;font-size:18px}
+.cat-btn:hover{background:#8a2be2;color:#fff}
+#categoriaAtual{flex:1;text-align:center;font-weight:bold;font-size:20px}
+
+@media (max-width: 768px) { .channel-list { margin-bottom: 60px; } body { flex-direction: column; } main { order: 1; height: 35vh; width: 100%; padding: 0; } aside { order: 2; width: 100%; height: 65vh; border-right: none; border-top: 2px solid var(--purple); } }
     </style>
 </head>
 <body>
     <aside>
-        <div class="brand-container"><div class="nav-header"><span>CANAIS DE TV</span></div></div>
+        <div class="brand-container">
+<div class="nav-header categoria-header">
+<button class="cat-btn" onclick="categoriaAnterior()">❮</button>
+<span id="categoriaAtual">Todos</span>
+<button class="cat-btn" onclick="proximaCategoria()">❯</button>
+</div></div>
         <div class="search-box"><input type="text" id="filter" placeholder="🔍 Buscar canal..." onkeyup="filterList()"></div>
         <div class="channel-list" id="contentList"></div>
     </aside>
@@ -84,7 +95,7 @@
 
     <script>
         let currentClappr;
-        let canaisRaw = [];
+        let canaisRaw=[];let categorias=[];let categoriaAtual="Todos";let indiceCategoria=0;
         let isSmartBuffering = false;
         let objBufferTarget = 30; 
         let maxPercentReached = 0;
@@ -100,8 +111,11 @@
             try {
                 const response = await fetch('imagens.json');
                 if (!response.ok) throw new Error('Falha');
-                canaisRaw = await response.json();
-                renderList();
+                canaisRaw=await response.json();
+const s=new Set(["Todos"]);
+canaisRaw.forEach(c=>{(c.categorias||[]).forEach(x=>{if(x!="Todos")s.add(x);});});
+categorias=[...s];
+renderList();
             } catch (error) { document.getElementById('contentList').innerHTML = `<div class="item" style="color:red; text-align:center;">Erro ao carregar imagens.json</div>`; }
         }
 
@@ -112,16 +126,21 @@
         }
 
         function renderList(){
-            const l = document.getElementById('contentList');
-            canaisRaw.forEach((item, idx) => {
-                const div = document.createElement('div');
-                div.className = 'item';
-                div.innerHTML = `<span class="channel-number">${(idx+1).toString().padStart(2,'0')}</span><span>${item.canal || "Canal"}</span>`;
-                div.onclick = () => playCanal(item, div);
-                div.ondblclick = () => { playCanal(item, div); toggleFullScreen(); };
-                l.appendChild(div);
-            });
-        }
+document.getElementById("categoriaAtual").innerText=categoriaAtual;
+const l=document.getElementById('contentList');l.innerHTML='';
+const lista=canaisRaw.filter(c=>categoriaAtual==="Todos"||(c.categorias||[]).includes(categoriaAtual));
+lista.forEach((item,idx)=>{
+const div=document.createElement('div');
+div.className='item';
+div.innerHTML=`<span class="channel-number">${(idx+1).toString().padStart(2,'0')}</span><span>${item.canal||"Canal"}</span>`;
+div.onclick=()=>playCanal(item,div);
+div.ondblclick=()=>{playCanal(item,div);toggleFullScreen();};
+l.appendChild(div);
+});
+}
+function proximaCategoria(){indiceCategoria=(indiceCategoria+1)%categorias.length;categoriaAtual=categorias[indiceCategoria];renderList();}
+function categoriaAnterior(){indiceCategoria=(indiceCategoria-1+categorias.length)%categorias.length;categoriaAtual=categorias[indiceCategoria];renderList();}
+
 
         function playCanal(c, el){
             document.querySelectorAll('.item').forEach(i => i.classList.remove('active'));
