@@ -24,11 +24,8 @@
         
         #player-container { width: 100%; height: 100%; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); position: relative; }
         #player, .player-wrapper, iframe { width: 100% !important; height: 100% !important; border: none; display: block; }
-
-        /* Estilo de Categorias */
-        .category-container { padding: 5px 10px; display: flex; flex-wrap: wrap; gap: 5px; border-bottom: 1px solid #222; }
-        .cat-btn { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-family: 'Rajdhani'; font-size: 12px; }
-        .cat-btn.active { border-color: var(--green); color: var(--green); }
+        
+        #player div[data-player], #player div[data-player] > div { width: 100% !important; height: 100% !important; }
 
         .brand-container { border-bottom: 1px solid #222; padding: 15px 10px; text-align: center; }
         .nav-header { display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, var(--green), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; font-size: 20px; letter-spacing: 1px; }
@@ -37,106 +34,176 @@
         .channel-list { overflow-y: auto; flex-grow: 1; }
         
         .item { padding: 12px 15px; margin: 5px 10px; background: #1a1a1a; border-radius: 8px; display: flex; align-items: center; font-size: 16px; font-weight: 600; cursor: pointer; border-left: 4px solid transparent; user-select: none; transition: 0.2s; }
-        .item:hover { background: #222; transform: translateX(5px); }
+        .item:hover { background: rgba(34,34,34,0.7); transform: translateX(5px); }
         .item.active { border-left-color: var(--green); background: rgba(138,43,226,0.15); color: var(--green); }
         .channel-number { min-width: 30px; font-size: 11px; color: var(--purple); margin-right: 12px; background: #000; padding: 2px 6px; border-radius: 4px; text-align: center; }
         
-        #smart-buffer-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; color: #fff; }
+        #smart-buffer-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-family: 'Rajdhani', sans-serif; }
         .spinner { width: 50px; height: 50px; border: 5px solid rgba(138,43,226,0.3); border-top-color: var(--green); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .progress-text { font-size: 24px; font-weight: bold; color: var(--green); letter-spacing: 1px; }
+
+        /* Barra de progresso 1px com efeito de fade */
+        #custom-progress-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 1px; background: rgba(0, 0, 0, 0.5); z-index: 1000; display: none; transition: opacity 1s ease, height 0.2s ease; opacity: 1; }
+        #player-container:hover #custom-progress-bar { height: 3px; }
+        #bar-buffered { position: absolute; top: 0; left: 0; height: 100%; background: rgba(255, 255, 255, 0.4); width: 0%; }
+        #bar-played { position: absolute; top: 0; left: 0; height: 100%; background: var(--green); width: 0%; transition: width 0.3s linear; }
         
-        #custom-progress-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 1px; background: rgba(0, 0, 0, 0.5); z-index: 1000; }
-        #bar-played { background: var(--green); height: 100%; width: 0%; box-shadow: 0 0 10px var(--green); }
+        #time-display { position: absolute; top: 4px; left: 10px; right: 10px; display: flex; justify-content: space-between; font-size: 14px; color: #fff; font-family: monospace; z-index: 1001; pointer-events: none; transition: opacity 1s ease; opacity: 0; }
+
+        @media (max-width: 768px) { .channel-list { margin-bottom: 60px; } body { flex-direction: column; } main { order: 1; height: 35vh; width: 100%; padding: 0; } aside { order: 2; width: 100%; height: 65vh; border-right: none; border-top: 2px solid var(--purple); } }
     </style>
 </head>
 <body>
     <aside>
-        <div class="brand-container"><div class="nav-header">CANAIS DE TV</div></div>
-        <div class="search-box"><input type="text" id="filter" placeholder="🔍 Buscar canal..." onkeyup="renderList()"></div>
-        <div class="category-container" id="catList"></div>
+        <div class="brand-container"><div class="nav-header"><span>CANAIS DE TV</span></div></div>
+        <div class="search-box"><input type="text" id="filter" placeholder="🔍 Buscar canal..." onkeyup="filterList()"></div>
         <div class="channel-list" id="contentList"></div>
     </aside>
     
     <main>
         <div id="player-container" ondblclick="toggleFullScreen()">
-            <div id="smart-buffer-overlay"><div class="spinner"></div><div id="overlay-text">Carregando...</div></div>
-            <div id="custom-progress-bar"><div id="bar-played"></div></div>
+            <div id="smart-buffer-overlay">
+                <div class="spinner"></div>
+                <div class="progress-text" id="overlay-text">Carregando 0%</div>
+            </div>
+            
+            <div id="custom-progress-bar">
+                <div id="bar-buffered"></div>
+                <div id="bar-played"></div>
+            </div>
+
+            <div id="time-display">
+                <span id="txt-atual">00:00</span>
+                <span id="txt-baixado">00:00</span>
+            </div>
+            
             <div id="player"></div>
         </div>
     </main>
 
     <script>
-        let currentClappr, canaisRaw = [], catAtual = "Todos", isSmartBuffering = false;
+        let currentClappr;
+        let canaisRaw = [];
+        let isSmartBuffering = false;
+        let objBufferTarget = 30; 
+        let maxPercentReached = 0;
+        let fadeTimeout;
+        
+        function formatTime(s) {
+            let m = Math.floor(s / 60);
+            let sec = Math.floor(s % 60);
+            return `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+        }
 
         async function carregarCanaisJSON() {
             try {
-                const res = await fetch('imagens.json');
-                canaisRaw = await res.json();
-                renderCats();
+                const response = await fetch('imagens.json');
+                if (!response.ok) throw new Error('Falha');
+                canaisRaw = await response.json();
                 renderList();
-            } catch (e) { document.getElementById('contentList').innerHTML = "Erro ao carregar."; }
-        }
-
-        function renderCats() {
-            const container = document.getElementById('catList');
-            const cats = ["Todos", ...new Set(canaisRaw.flatMap(c => c.categorias))];
-            cats.forEach(cat => {
-                const btn = document.createElement('button');
-                btn.className = 'cat-btn' + (cat === "Todos" ? ' active' : '');
-                btn.innerText = cat;
-                btn.onclick = () => {
-                    catAtual = cat;
-                    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    renderList();
-                };
-                container.appendChild(btn);
-            });
-        }
-
-        function renderList() {
-            const l = document.getElementById('contentList'), termo = document.getElementById('filter').value.toLowerCase();
-            l.innerHTML = "";
-            canaisRaw.forEach((item, idx) => {
-                if ((catAtual === "Todos" || item.categorias.includes(catAtual)) && item.canal.toLowerCase().includes(termo)) {
-                    const div = document.createElement('div');
-                    div.className = 'item';
-                    div.innerHTML = `<span class="channel-number">${(idx+1).toString().padStart(2,'0')}</span><span>${item.canal}</span>`;
-                    div.onclick = () => playCanal(item, div);
-                    l.appendChild(div);
-                }
-            });
-        }
-
-        function playCanal(c, el) {
-            document.querySelectorAll('.item').forEach(i => i.classList.remove('active'));
-            el.classList.add('active');
-            if(currentClappr) currentClappr.destroy();
-            
-            isSmartBuffering = true;
-            document.getElementById('smart-buffer-overlay').style.display = "flex";
-
-            currentClappr = new Clappr.Player({
-                source: c.qualidade === "hd" ? c.logo + "/file.txt?m3u8" : c.logo,
-                parentId: "#player",
-                plugins: [HlsjsPlayback],
-                autoPlay: true,
-                playback: { hlsjsConfig: { maxBufferLength: 45 } }
-            });
+            } catch (error) { document.getElementById('contentList').innerHTML = `<div class="item" style="color:red; text-align:center;">Erro ao carregar imagens.json</div>`; }
         }
 
         function toggleFullScreen(){
             const c = document.getElementById('player-container');
-            !document.fullscreenElement ? c.requestFullscreen() : document.exitFullscreen();
+            if(!document.fullscreenElement) c.requestFullscreen();
+            else document.exitFullscreen();
+        }
+
+        function renderList(){
+            const l = document.getElementById('contentList');
+            canaisRaw.forEach((item, idx) => {
+                const div = document.createElement('div');
+                div.className = 'item';
+                div.innerHTML = `<span class="channel-number">${(idx+1).toString().padStart(2,'0')}</span><span>${item.canal || "Canal"}</span>`;
+                div.onclick = () => playCanal(item, div);
+                div.ondblclick = () => { playCanal(item, div); toggleFullScreen(); };
+                l.appendChild(div);
+            });
+        }
+
+        function playCanal(c, el){
+            document.querySelectorAll('.item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            clearPlayer();
+            
+            // Re-exibir barra ao clicar
+            const bar = document.getElementById('custom-progress-bar');
+            bar.style.display = "block";
+            bar.style.opacity = "1";
+            document.getElementById('time-display').style.opacity = "1";
+            
+            // Iniciar contagem de 5s para sumir
+            clearTimeout(fadeTimeout);
+            fadeTimeout = setTimeout(() => {
+                bar.style.opacity = "0";
+                document.getElementById('time-display').style.opacity = "0";
+                setTimeout(() => { bar.style.display = "none"; }, 1000);
+            }, 5000);
+
+            let urlVideo = c.logo;
+            if (c.qualidade === "hd") urlVideo += "/file.txt?m3u8";
+
+            isSmartBuffering = true;
+            maxPercentReached = 0;
+            currentClappr = new Clappr.Player({
+                source: urlVideo, 
+                mimeType: 'application/vnd.apple.mpegurl', 
+                parentId: "#player",
+                plugins: [HlsjsPlayback],
+                autoPlay: true, 
+                playback: {
+                    hlsjsConfig: {
+                        maxBufferLength: 45, maxMaxBufferLength: 60, maxBufferSize: 60 * 1000 * 1000, 
+                        liveSyncDuration: 30, liveMaxLatencyDuration: 120, lowLatencyMode: false 
+                    }
+                }
+            });
+        }
+
+        function clearPlayer(){
+            if(currentClappr){ currentClappr.destroy(); currentClappr = null; }
+            document.getElementById('smart-buffer-overlay').style.display = "none";
+            isSmartBuffering = false;
+        }
+
+        function filterList(){
+            let v = document.getElementById('filter').value.toLowerCase();
+            document.querySelectorAll('.item').forEach(el => {
+                el.style.display = el.innerText.toLowerCase().includes(v) ? 'flex' : 'none';
+            });
         }
 
         setInterval(() => {
             const video = document.querySelector('video');
+            const overlay = document.getElementById('smart-buffer-overlay');
+            const progressBar = document.getElementById('custom-progress-bar');
+            
             if (video && currentClappr) {
-                document.getElementById('bar-played').style.width = (video.currentTime / video.duration * 100) + "%";
-                if (isSmartBuffering && video.readyState === 4) {
-                    isSmartBuffering = false;
-                    document.getElementById('smart-buffer-overlay').style.display = "none";
+                let atual = video.currentTime;
+                let baixado = (video.buffered.length > 0) ? video.buffered.end(video.buffered.length - 1) : 0;
+                
+                document.getElementById('txt-atual').innerText = formatTime(atual);
+                document.getElementById('txt-baixado').innerText = formatTime(baixado);
+
+                if (isSmartBuffering) {
+                    overlay.style.display = "flex";
+                    let folga = (baixado - atual);
+                    let p = Math.min(100, Math.round((folga / objBufferTarget) * 100));
+                    if (p > maxPercentReached) maxPercentReached = p;
+                    document.getElementById('overlay-text').innerText = `Carregando ${maxPercentReached}%`;
+                    if (folga >= objBufferTarget || (baixado > 0 && folga > 20 && video.readyState === 4)) {
+                        isSmartBuffering = false; 
+                        overlay.style.display = "none"; 
+                        video.play(); 
+                    }
+                }
+
+                let duracao = video.duration;
+                if (duracao && duracao !== Infinity) {
+                    document.getElementById('bar-buffered').style.width = (baixado / duracao * 100) + "%";
+                    document.getElementById('bar-played').style.width = (atual / duracao * 100) + "%";
                 }
             }
         }, 500);
@@ -145,7 +212,17 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/disable-devtool@latest/disable-devtool.min.js"></script>
     <script>
-        DisableDevtool({ md5: '8865f3a072045558837311100572d427', url: 'bloqueado.html', disableMenu: true, disableSelect: true });
+        DisableDevtool({
+            md5: '8865f3a072045558837311100572d427',
+            url: 'bloqueado.html',
+            tk_name: 'adblock_key',
+            debug: false,
+            disableMenu: true,
+            disableSelect: true,
+            disableCopy: true,
+            disableCut: true,
+            disablePaste: true
+        });
     </script>
 </body>
 </html>
