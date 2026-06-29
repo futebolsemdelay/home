@@ -52,10 +52,30 @@
         #time-display { position: absolute; top: 4px; left: 10px; right: 10px; display: flex; justify-content: space-between; font-size: 14px; color: #fff; font-family: monospace; z-index: 1001; pointer-events: none; transition: opacity 1s ease; opacity: 0; }
 
         
-.categoria-header{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.cat-btn{width:34px;height:34px;border:none;border-radius:50%;background:#222;color:#00ff88;cursor:pointer;font-size:18px}
-.cat-btn:hover{background:#8a2be2;color:#fff}
-#categoriaAtual{flex:1;text-align:center;font-weight:bold;font-size:20px}
+
+.categoria-header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 8px;
+gap:10px;
+}
+.tituloCategoria{
+flex:1;
+text-align:center;
+font-size:22px;
+font-weight:bold;
+background:linear-gradient(90deg,#00ff88,#8a2be2);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+.cat-btn{
+width:38px;height:38px;border-radius:50%;
+border:1px solid #8a2be2;background:#111;color:#00ff88;
+font-size:22px;cursor:pointer;
+}
+.cat-btn:hover{background:#8a2be2;color:#fff;}
+
 
 @media (max-width: 768px) { .channel-list { margin-bottom: 60px; } body { flex-direction: column; } main { order: 1; height: 35vh; width: 100%; padding: 0; } aside { order: 2; width: 100%; height: 65vh; border-right: none; border-top: 2px solid var(--purple); } }
     </style>
@@ -63,9 +83,9 @@
 <body>
     <aside>
         <div class="brand-container">
-<div class="nav-header categoria-header">
+<div class="categoria-header">
 <button class="cat-btn" onclick="categoriaAnterior()">❮</button>
-<span id="categoriaAtual">Todos</span>
+<div class="tituloCategoria"><span id="categoriaAtual">Todos</span></div>
 <button class="cat-btn" onclick="proximaCategoria()">❯</button>
 </div></div>
         <div class="search-box"><input type="text" id="filter" placeholder="🔍 Buscar canal..." onkeyup="filterList()"></div>
