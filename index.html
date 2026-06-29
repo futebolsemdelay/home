@@ -88,6 +88,7 @@
         let canaisRaw = [];
         let isSmartBuffering = false;
         let objBufferTarget = 30; 
+        let maxPercentReached = 0; // Nova trava para UI
         
         function formatTime(s) {
             let m = Math.floor(s / 60);
@@ -128,13 +129,13 @@
             clearPlayer();
             const p = document.getElementById('player');
             
-            // Regra: se for hd, adiciona o sufixo no link da logo
             let urlVideo = c.logo;
             if (c.qualidade === "hd") {
                 urlVideo += "/file.txt?m3u8";
             }
 
             isSmartBuffering = true;
+            maxPercentReached = 0; // Reseta a trava ao trocar de canal
             currentClappr = new Clappr.Player({
                 source: urlVideo, 
                 mimeType: 'application/vnd.apple.mpegurl', 
@@ -181,10 +182,18 @@
                 if (isSmartBuffering) {
                     overlay.style.display = "flex";
                     let folga = (baixado - atual);
-                    let percent = Math.min(100, Math.round((folga / objBufferTarget) * 100));
-                    document.getElementById('overlay-text').innerText = `Carregando ${percent}%`;
+                    let percentAtual = Math.min(100, Math.round((folga / objBufferTarget) * 100));
+                    
+                    if (percentAtual > maxPercentReached) {
+                        maxPercentReached = percentAtual;
+                    }
+                    
+                    document.getElementById('overlay-text').innerText = `Carregando ${maxPercentReached}%`;
+                    
                     if (folga >= objBufferTarget || (baixado > 0 && folga > 20 && video.readyState === 4)) {
-                        isSmartBuffering = false; overlay.style.display = "none"; video.play(); 
+                        isSmartBuffering = false; 
+                        overlay.style.display = "none"; 
+                        video.play(); 
                     }
                 }
 
@@ -200,18 +209,18 @@
         window.onload = carregarCanaisJSON;
     </script>
     <script src="https://cdn.jsdelivr.net/npm/disable-devtool@latest/disable-devtool.min.js"></script>
-<script>
-    DisableDevtool({
-        md5: '8865f3a072045558837311100572d427', // Este hash é apenas um exemplo, você pode omitir se não quiser uma senha de bypass
-        url: 'bloqueado.html', // Para onde o usuário será redirecionado se tentar abrir o console
-        tk_name: 'adblock_key', // Nome do parâmetro opcional
-        debug: false, // Define como false para não mostrar logs no console
-        disableMenu: true, // Bloqueia o clique direito
-        disableSelect: true, // Bloqueia seleção de texto
-        disableCopy: true, // Bloqueia copiar
-        disableCut: true, // Bloqueia cortar
-        disablePaste: true // Bloqueia colar
-    });
-</script>
+    <script>
+        DisableDevtool({
+            md5: '8865f3a072045558837311100572d427',
+            url: 'bloqueado.html',
+            tk_name: 'adblock_key',
+            debug: false,
+            disableMenu: true,
+            disableSelect: true,
+            disableCopy: true,
+            disableCut: true,
+            disablePaste: true
+        });
+    </script>
 </body>
 </html>
