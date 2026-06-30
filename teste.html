@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Player EmbedTV</title>
+    <style>
+        body { background: #111; color: white; text-align: center; font-family: sans-serif; }
+        .controls { padding: 20px; }
+        #btn-play { 
+            padding: 15px 40px; font-size: 20px; cursor: pointer; 
+            background: #00ff88; border: none; border-radius: 5px; font-weight: bold;
+        }
+        #container-player { width: 100%; max-width: 800px; margin: 0 auto; height: 450px; }
+        iframe { width: 100%; height: 100%; border: none; }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <button id="btn-play">▶ PLAY</button>
+    </div>
+
+    <div id="container-player">
+        <iframe id="meuIframe" src="LINK_DO_PLAYER_DELES" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    </div>
+
+    <script>
+        document.getElementById('btn-play').addEventListener('click', function() {
+            const iframe = document.getElementById('meuIframe');
+            
+            // Tenta disparar o evento de play de várias formas
+            try {
+                // Tenta mandar mensagem direta para o player (se ele aceitar postMessage)
+                iframe.contentWindow.postMessage('{"method":"play"}', '*');
+                
+                // Tenta disparar o click no elemento de vídeo dentro do iframe (Pode falhar por segurança)
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                const playBtn = iframeDoc.querySelector('.play-wrapper');
+                if (playBtn) {
+                    playBtn.click();
+                }
+            } catch (e) {
+                console.log("Bloqueio de segurança: O site deles não permite controle externo.");
+                alert("O site deles bloqueia o clique externo. Você precisará clicar dentro do player.");
+            }
+        });
+    </script>
+</body>
+</html>
