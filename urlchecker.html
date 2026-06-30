@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Verificador de Links</title>
+
+<style>
+body{
+    background:#111;
+    color:#fff;
+    font-family:Arial;
+    margin:20px;
+}
+textarea{
+    width:100%;
+    height:220px;
+    background:#000;
+    color:#0f0;
+    border:1px solid #444;
+    padding:10px;
+    box-sizing:border-box;
+}
+button{
+    padding:10px 20px;
+    margin:5px;
+    cursor:pointer;
+    background:#222;
+    color:#fff;
+    border:1px solid #555;
+}
+button:hover{
+    background:#444;
+}
+#barra{
+    width:100%;
+    height:20px;
+    background:#333;
+    margin-top:15px;
+}
+#progresso{
+    height:100%;
+    width:0%;
+    background:#00cc66;
+}
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+th,td{
+    border:1px solid #333;
+    padding:6px;
+}
+.ok{color:#00ff88;}
+.erro{color:#ff5555;}
+.cors{color:#ffaa00;}
+</style>
+
+</head>
+<body>
+
+<h2>Verificador de URLs</h2>
+
+<textarea id="urls" placeholder="Cole um link por linha"></textarea>
+
+<br>
+
+<button onclick="verificar()">Verificar</button>
+<button onclick="copiarErros()">Copiar Erros</button>
+<button onclick="copiarOK()">Copiar Funcionando</button>
+
+<div id="barra">
+<div id="progresso"></div>
+</div>
+
+<p>
+
+OK:
+<span id="ok">0</span>
+
+|
+
+Erros:
+<span id="erro">0</span>
+
+|
+
+CORS:
+<span id="cors">0</span>
+
+|
+
+Total:
+<span id="total">0</span>
+
+</p>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Status</th>
+
+<th>URL</th>
+
+</tr>
+
+</thead>
+
+<tbody id="resultado"></tbody>
+
+</table>
+
+<script>
+
+let erros=[];
+let oks=[];
+
+async function testar(url){
+
+    try{
+
+        let r=await fetch(url,{
+            method:"HEAD",
+            cache:"no-store"
+        });
+
+        return r.status;
+
+    }catch(e){
+
+        try{
+
+            let r=await fetch(url,{
+                method:"GET",
+                cache:"no-store"
+            });
+
+            return r.status;
+
+        }catch(e){
+
+            return "CORS";
+
+        }
+
+    }
+
+}
+
+async function verificar(){
+
+erros=[];
+oks=[];
+
+resultado.innerHTML="";
+
+let lista=urls.value
+.split("\n")
+.map(x=>x.trim())
+.filter(x=>x!="");
+
+total.innerText=lista.length;
+
+ok.innerText=0;
+erro.innerText=0;
+cors.innerText=0;
+
+let feitos=0;
+
+let indice=0;
+
+const simultaneos=20;
+
+async function worker(){
+
+while(indice<lista.length){
+
+let i=indice++;
+
+let url=lista[i];
+
+let status=await testar(url);
+
+let tr=document.createElement("tr");
+
+let td1=document.createElement("td");
+let td2=document.createElement("td");
+
+td2.textContent=url;
+
+if(status==="CORS"){
+
+td1.innerHTML="<span class='cors'>CORS</span>";
+
+cors.innerText=Number(cors.innerText)+1;
+
+erros.push(url);
+
+}
+else if(status>=200 && status<400){
+
+td1.innerHTML="<span class='ok'>"+status+"</span>";
+
+ok.innerText=Number(ok.innerText)+1;
+
+oks.push(url);
+
+}
+else{
+
+td1.innerHTML="<span class='erro'>"+status+"</span>";
+
+erro.innerText=Number(erro.innerText)+1;
+
+erros.push(url);
+
+}
+
+tr.appendChild(td1);
+tr.appendChild(td2);
+
+resultado.appendChild(tr);
+
+feitos++;
+
+progresso.style.width=((feitos/lista.length)*100)+"%";
+
+}
+
+}
+
+let workers=[];
+
+for(let i=0;i<simultaneos;i++)
+workers.push(worker());
+
+await Promise.all(workers);
+
+alert("Concluído!");
+
+}
+
+function copiarErros(){
+
+navigator.clipboard.writeText(erros.join("\n"));
+
+alert("Copiado!");
+
+}
+
+function copiarOK(){
+
+navigator.clipboard.writeText(oks.join("\n"));
+
+alert("Copiado!");
+
+}
+
+</script>
+
+</body>
+</html>
