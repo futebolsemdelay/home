@@ -135,7 +135,7 @@ const s=new Set(["Todos"]);
 canaisRaw.forEach(c=>{(c.categorias||[]).forEach(x=>{if(x!="Todos")s.add(x);});});
 categorias=[...s];
 renderList();
-            } catch (error) { document.getElementById('contentList').innerHTML = `<div class="item" style="color:red; text-align:center;">Erro ao carregar imagens.json</div>`; }
+            } catch (error) { document.getElementById('contentList').innerHTML = `<div class="item" style="color:red; text-align:center;">Erro ao Ler a Lista de Canais</div>`; }
         }
 
         function toggleFullScreen(){
@@ -181,7 +181,7 @@ function categoriaAnterior(){indiceCategoria=(indiceCategoria-1+categorias.lengt
             }, 5000);
 
             // Define o prefixo do seu Worker
-            const workerPrefix = "https://delicate-feather-5576.futebolsemdelay.workers.dev/?url=";
+            const workerPrefix = "https://delicate-feather-5576.futebolsemdelay.workers.dev/?url=https://ww4.embedtv.lat/";
             
             let urlVideo = c.logo;
 
