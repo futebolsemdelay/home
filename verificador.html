@@ -2,80 +2,58 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Verificador de Canais - Auditoria</title>
+    <title>Auditoria Real de Canais</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #f4f4f9; }
-        .erro-box { background: #fee; border: 2px solid #f00; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
-        .erro-item { color: #d00; margin: 5px 0; font-weight: bold; }
-        table { border-collapse: collapse; width: 100%; background: #fff; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background: #333; color: #fff; }
-        .status-ok { color: green; }
-        .status-erro { color: red; }
+        body { font-family: sans-serif; padding: 20px; background: #f0f2f5; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .erro-item { color: #d32f2f; padding: 8px; border-bottom: 1px solid #eee; font-weight: bold; }
+        .ok-item { color: #388e3c; }
+        #resultados { margin-top: 20px; }
+        input { margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-    <h1>Auditoria de Canais</h1>
-    <div id="relatorioErros" class="erro-box">
-        <h3>🚨 Canais Inacessíveis:</h3>
-        <div id="listaErros">Nenhum erro encontrado até o momento...</div>
-    </div>
-
-    <table id="tabelaCanais">
-        <thead>
-            <tr>
-                <th>Canal</th>
-                <th>Qualidade</th>
-                <th>URL Final</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+<div class="container">
+    <h1>Auditoria de Canais (Status Real)</h1>
+    <p>Selecione o seu arquivo <b>imagens.json</b> abaixo:</p>
+    <input type="file" id="inputJson" accept=".json">
+    
+    <div id="resultados"></div>
+</div>
 
 <script>
-async function iniciarVerificacao() {
-    const tabelaBody = document.querySelector("#tabelaCanais tbody");
-    const listaErros = document.querySelector("#listaErros");
-    let encontrouErro = false;
+document.getElementById('inputJson').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const reader = new FileReader();
 
-    try {
-        const resposta = await fetch('imagens.json');
-        const canais = await resposta.json();
+    reader.onload = async function(event) {
+        const canais = JSON.parse(event.target.result);
+        const divRes = document.getElementById('resultados');
+        divRes.innerHTML = "<h3>Processando...</h3>";
 
-        canais.forEach(item => {
+        for (const item of canais) {
             const urlFinal = item.qualidade === 'hd' ? item.logo + '/file.txt' : item.logo + '.m3u8';
             
-            // Adiciona na tabela
-            const row = tabelaBody.insertRow();
-            row.innerHTML = `<td>${item.canal}</td><td>${item.qualidade}</td><td>${urlFinal}</td><td class="status">Testando...</td>`;
-            const statusCell = row.querySelector('.status');
-
-            // Testa a URL
-            fetch(urlFinal, { method: 'HEAD', mode: 'no-cors' })
-                .then(() => {
-                    statusCell.innerText = "OK";
-                    statusCell.className = "status-ok";
-                })
-                .catch(() => {
-                    statusCell.innerText = "FORA DO AR";
-                    statusCell.className = "status-erro";
-                    
-                    // Adiciona ao relatório de erros
-                    if (!encontrouErro) { listaErros.innerHTML = ""; encontrouErro = true; }
-                    const divErro = document.createElement('div');
-                    divErro.className = "erro-item";
-                    divErro.innerHTML = `❌ ${item.canal} (${item.qualidade}) - <a href="${urlFinal}" target="_blank">Abrir link</a>`;
-                    listaErros.appendChild(divErro);
-                });
-        });
-    } catch (err) {
-        listaErros.innerHTML = "Erro ao carregar o arquivo JSON. Certifique-se de usar um servidor local (Live Server).";
-    }
-}
-
-iniciarVerificacao();
+            try {
+                // Usamos o modo 'cors' para tentar capturar o status real. 
+                // Se o servidor for estrito, ele ainda pode bloquear, mas capturaremos o erro.
+                const response = await fetch(urlFinal, { method: 'HEAD', mode: 'cors' });
+                
+                if (response.status === 200) {
+                    // Ignora sucesso no log, mostra apenas erros
+                } else {
+                    divRes.innerHTML += `<div class="erro-item">❌ [ERRO ${response.status}] ${item.canal}</div>`;
+                }
+            } catch (err) {
+                // Se cair aqui, é erro de bloqueio de rede ou CORS
+                divRes.innerHTML += `<div class="erro-item">⚠️ [BLOQUEADO/403] ${item.canal} (Provável Token Expirado)</div>`;
+            }
+        }
+        divRes.innerHTML += "<h3>Auditoria Concluída.</h3>";
+    };
+    reader.readAsText(file);
+});
 </script>
 </body>
 </html>
