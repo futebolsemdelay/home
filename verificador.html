@@ -2,58 +2,61 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Auditoria Real de Canais</title>
+    <title>Auditoria de Canais - GitHub</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f0f2f5; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .erro-item { color: #d32f2f; padding: 8px; border-bottom: 1px solid #eee; font-weight: bold; }
-        .ok-item { color: #388e3c; }
-        #resultados { margin-top: 20px; }
-        input { margin-bottom: 20px; }
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f9; }
+        .box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .erro { color: #d32f2f; font-weight: bold; margin: 5px 0; padding: 5px; border-bottom: 1px solid #eee; }
+        .status-msg { margin-bottom: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Auditoria de Canais (Status Real)</h1>
-    <p>Selecione o seu arquivo <b>imagens.json</b> abaixo:</p>
-    <input type="file" id="inputJson" accept=".json">
-    
-    <div id="resultados"></div>
+<div class="box">
+    <h1>Verificando canais do GitHub...</h1>
+    <div id="status" class="status-msg">Carregando imagens.json...</div>
+    <div id="listaErros"></div>
 </div>
 
 <script>
-document.getElementById('inputJson').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    const reader = new FileReader();
+async function rodarAuditoria() {
+    const listaErros = document.getElementById('listaErros');
+    const statusDiv = document.getElementById('status');
 
-    reader.onload = async function(event) {
-        const canais = JSON.parse(event.target.result);
-        const divRes = document.getElementById('resultados');
-        divRes.innerHTML = "<h3>Processando...</h3>";
+    try {
+        // Carrega o JSON que está na mesma pasta
+        const resposta = await fetch('imagens.json');
+        const canais = await resposta.json();
+        
+        statusDiv.innerText = `Auditando ${canais.length} canais...`;
 
         for (const item of canais) {
             const urlFinal = item.qualidade === 'hd' ? item.logo + '/file.txt' : item.logo + '.m3u8';
             
             try {
-                // Usamos o modo 'cors' para tentar capturar o status real. 
-                // Se o servidor for estrito, ele ainda pode bloquear, mas capturaremos o erro.
-                const response = await fetch(urlFinal, { method: 'HEAD', mode: 'cors' });
-                
-                if (response.status === 200) {
-                    // Ignora sucesso no log, mostra apenas erros
-                } else {
-                    divRes.innerHTML += `<div class="erro-item">❌ [ERRO ${response.status}] ${item.canal}</div>`;
+                // Tenta acessar com 'cors'. Se o servidor for estrito, ele vai falhar ou dar 403
+                const res = await fetch(urlFinal, { 
+                    method: 'HEAD', 
+                    mode: 'cors',
+                    headers: { 'Referer': 'https://croudfront.lat/' } 
+                });
+
+                if (!res.ok) {
+                    // Aqui capturamos o 403 ou qualquer outro erro real
+                    listaErros.innerHTML += `<div class="erro">❌ [Erro ${res.status}] ${item.canal}</div>`;
                 }
             } catch (err) {
-                // Se cair aqui, é erro de bloqueio de rede ou CORS
-                divRes.innerHTML += `<div class="erro-item">⚠️ [BLOQUEADO/403] ${item.canal} (Provável Token Expirado)</div>`;
+                // Se o navegador bloquear via CORS, o erro cai aqui
+                listaErros.innerHTML += `<div class="erro">⚠️ [Bloqueado/CORS] ${item.canal}</div>`;
             }
         }
-        divRes.innerHTML += "<h3>Auditoria Concluída.</h3>";
-    };
-    reader.readAsText(file);
-});
+        statusDiv.innerText = "Auditoria finalizada.";
+    } catch (e) {
+        statusDiv.innerHTML = `<span style="color:red">Erro ao carregar imagens.json: ${e.message}</span>`;
+    }
+}
+
+rodarAuditoria();
 </script>
 </body>
 </html>
