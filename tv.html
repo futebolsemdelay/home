@@ -193,7 +193,7 @@ function categoriaAnterior(){indiceCategoria=(indiceCategoria-1+categorias.lengt
                 urlVideo = c.logo;
             }
 
-            const iframeURL="player.html?url="+encodeURIComponent(urlVideo);document.getElementById("player").innerHTML=`<iframe src="${iframeURL}" allowfullscreen allow="autoplay; fullscreen" style="width:100%;height:100%;border:none;"></iframe>`;
+            document.getElementById("player").innerHTML=`<iframe src="${urlVideo}" allowfullscreen allow="autoplay; fullscreen" style="width:100%;height:100%;border:none;"></iframe>`;
         }
 
         function clearPlayer(){document.getElementById("player").innerHTML="";document.getElementById("smart-buffer-overlay").style.display="none";isSmartBuffering=false;}
