@@ -2,82 +2,112 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Auditor de Canais Pro</title>
+    <title>Auditor e Simulador de Canais</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f4f4f9; }
-        .box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 900px; margin: auto; }
-        .resumo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-        .card { padding: 10px; background: #eee; border-radius: 5px; text-align: center; }
-        .erro-linha { color: #d32f2f; padding: 5px; border-bottom: 1px solid #ddd; font-size: 0.9em; }
-        .btn-simular { background: #007bff; color: white; padding: 10px; border: none; cursor: pointer; border-radius: 4px; }
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f4f4f9; }
+        .box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 1000px; margin: auto; }
+        .resumo-grid { display: flex; gap: 15px; margin-bottom: 20px; }
+        .card { padding: 15px; border-radius: 5px; flex: 1; text-align: center; font-weight: bold; }
+        .simulador { background: #e3f2fd; padding: 20px; border-radius: 5px; margin-top: 30px; border: 1px solid #90caf9; }
+        .linha-erro { color: #d32f2f; font-size: 0.85em; padding: 4px; border-bottom: 1px solid #eee; }
+        .linha-ok { color: #2e7d32; font-size: 0.85em; padding: 4px; border-bottom: 1px solid #eee; }
+        select { padding: 5px; margin-right: 10px; }
     </style>
 </head>
 <body>
 
 <div class="box">
-    <h1>Auditoria de Canais</h1>
-    
-    <div id="resumo" class="resumo-grid">Processando dados...</div>
-    
-    <div id="listaErros">
-        <h3>❌ Canais OFF (Lista para Auditoria)</h3>
-        <div id="conteudoErros"></div>
+    <h1>Auditoria Completa</h1>
+    <div id="resumo" class="resumo-grid">Processando auditoria...</div>
+
+    <div id="listaPrincipal">
+        <h2>Canais OFF</h2>
+        <div id="containerErros"></div>
+    </div>
+
+    <div class="simulador">
+        <h3>🚀 Teste de Substituição de Domínio</h3>
+        <p>Selecione um domínio que está com erro e tente substituí-lo por um que está OK:</p>
+        <select id="selectDe"></select>
+        <select id="selectPara"></select>
+        <button onclick="testarSubstituicao()" style="padding: 5px 15px; cursor: pointer;">Testar Substituição</button>
+        <div id="resultadoSimulacao" style="margin-top: 15px;"></div>
     </div>
 </div>
 
 <script>
-async function iniciarAuditoria() {
-    const conteudoErros = document.getElementById('conteudoErros');
-    const resumoDiv = document.getElementById('resumo');
-    
-    let stats = { total: 0, ok: 0, erro: 0, dominios: {} };
-    let listaOff = [];
+let canaisGlobais = [];
+let dominiosErrados = new Set();
+let dominiosOk = new Set();
 
+async function iniciarTudo() {
     try {
         const res = await fetch('imagens.json');
-        const canais = await res.json();
-        stats.total = canais.length;
+        canaisGlobais = await res.json();
+        
+        const containerErros = document.getElementById('containerErros');
+        const resumoDiv = document.getElementById('resumo');
+        let cont = { total: canaisGlobais.length, ok: 0, erro: 0 };
 
-        for (const item of canais) {
+        for (const item of canaisGlobais) {
             const urlFinal = item.qualidade === 'hd' ? item.logo + '/file.txt' : item.logo + '.m3u8';
             const dom = new URL(item.logo).hostname;
 
             try {
                 const check = await fetch(urlFinal, { method: 'HEAD', mode: 'cors' });
                 if (check.ok) {
-                    stats.ok++;
+                    cont.ok++;
+                    dominiosOk.add(dom);
                 } else {
-                    throw new Error(check.status);
+                    throw new Error();
                 }
-            } catch (err) {
-                stats.erro++;
-                stats.dominios[dom] = (stats.dominios[dom] || 0) + 1;
-                
-                listaOff.push({ canal: item.canal, url: urlFinal, dominio: dom });
-                conteudoErros.innerHTML += `<div class="erro-linha">
-                    ❌ <b>${item.canal}</b> | Domínio: ${dom} | URL: <a href="${urlFinal}" target="_blank">${urlFinal}</a>
-                </div>`;
+            } catch(e) {
+                cont.erro++;
+                dominiosErrados.add(dom);
+                containerErros.innerHTML += `<div class="linha-erro">❌ ${item.canal} | <b>${dom}</b> | ${urlFinal}</div>`;
             }
         }
 
-        // Renderiza Resumo
         resumoDiv.innerHTML = `
-            <div class="card">Total: ${stats.total}</div>
-            <div class="card" style="color:green">OK: ${stats.ok}</div>
-            <div class="card" style="color:red">OFF: ${stats.erro}</div>
+            <div class="card" style="background:#ddd">Total: ${cont.total}</div>
+            <div class="card" style="background:#c8e6c9">OK: ${cont.ok}</div>
+            <div class="card" style="background:#ffcdd2">OFF: ${cont.erro}</div>
         `;
 
-        // Mostra resumo de domínios
-        let domHtml = "<h3>Erros por Domínio:</h3><ul>";
-        for (let d in stats.dominios) domHtml += `<li><b>${d}</b>: ${stats.dominios[d]} erros</li>`;
-        resumoDiv.innerHTML += domHtml + "</ul>";
+        // Popular selects
+        const sDe = document.getElementById('selectDe');
+        const sPara = document.getElementById('selectPara');
+        dominiosErrados.forEach(d => sDe.innerHTML += `<option value="${d}">${d}</option>`);
+        dominiosOk.forEach(d => sPara.innerHTML += `<option value="${d}">${d}</option>`);
 
-    } catch (e) {
-        conteudoErros.innerHTML = "Erro fatal: " + e.message;
+    } catch(e) {
+        document.body.innerHTML = "Erro ao carregar imagens.json. Certifique-se de estar usando um servidor local.";
     }
 }
 
-iniciarAuditoria();
+async function testarSubstituicao() {
+    const de = document.getElementById('selectDe').value;
+    const para = document.getElementById('selectPara').value;
+    const resDiv = document.getElementById('resultadoSimulacao');
+    resDiv.innerHTML = "<b>Testando nova regra...</b>";
+
+    for (const item of canaisGlobais) {
+        const dom = new URL(item.logo).hostname;
+        if (dom === de) {
+            const novaUrl = (item.qualidade === 'hd' ? item.logo.replace(de, para) + '/file.txt' : item.logo.replace(de, para) + '.m3u8');
+            try {
+                const check = await fetch(novaUrl, { method: 'HEAD', mode: 'cors' });
+                resDiv.innerHTML += `<div class="${check.ok ? 'linha-ok' : 'linha-erro'}">
+                    ${check.ok ? '✅' : '❌'} ${item.canal}: ${novaUrl}
+                </div>`;
+            } catch(e) {
+                resDiv.innerHTML += `<div class="linha-erro">⚠️ Erro na tentativa: ${item.canal}</div>`;
+            }
+        }
+    }
+}
+
+iniciarTudo();
 </script>
 </body>
 </html>
