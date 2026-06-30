@@ -2,48 +2,43 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Player EmbedTV</title>
+    <title>Meu Portal de Canais</title>
     <style>
-        body { background: #111; color: white; text-align: center; font-family: sans-serif; }
-        .controls { padding: 20px; }
-        #btn-play { 
-            padding: 15px 40px; font-size: 20px; cursor: pointer; 
-            background: #00ff88; border: none; border-radius: 5px; font-weight: bold;
-        }
-        #container-player { width: 100%; max-width: 800px; margin: 0 auto; height: 450px; }
+        body { margin: 0; display: flex; height: 100vh; background: #1a1a1a; font-family: sans-serif; }
+        
+        /* Menu lateral */
+        #menu { width: 250px; background: #222; padding: 15px; border-right: 2px solid #444; }
+        .btn-canal { display: block; width: 100%; padding: 12px; margin-bottom: 10px; background: #333; color: white; border: none; cursor: pointer; text-align: left; border-radius: 4px; }
+        .btn-canal:hover { background: #444; }
+        
+        /* Área do player */
+        #player-area { flex-grow: 1; display: flex; align-items: center; justify-content: center; }
         iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
 <body>
 
-    <div class="controls">
-        <button id="btn-play">▶ PLAY</button>
+    <div id="menu">
+        <h3 style="color:white">Canais</h3>
+        <button class="btn-canal" onclick="trocarCanal('https://ww4.embedtv.lat/caze1')">Cazé TV</button>
+        <button class="btn-canal" onclick="trocarCanal('https://ww4.embedtv.lat/premiere')">Premiere</button>
+        <button class="btn-canal" onclick="trocarCanal('https://ww4.embedtv.lat/pt_abola')">A Bola</button>
     </div>
 
-    <div id="container-player">
-        <iframe id="meuIframe" src="https://ww4.embedtv.lat/caze1" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    <div id="player-area">
+        <iframe id="iframePlayer" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
     </div>
 
     <script>
-        document.getElementById('btn-play').addEventListener('click', function() {
-            const iframe = document.getElementById('meuIframe');
-            
-            // Tenta disparar o evento de play de várias formas
-            try {
-                // Tenta mandar mensagem direta para o player (se ele aceitar postMessage)
-                iframe.contentWindow.postMessage('{"method":"play"}', '*');
-                
-                // Tenta disparar o click no elemento de vídeo dentro do iframe (Pode falhar por segurança)
-                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                const playBtn = iframeDoc.querySelector('.play-wrapper');
-                if (playBtn) {
-                    playBtn.click();
-                }
-            } catch (e) {
-                console.log("Bloqueio de segurança: O site deles não permite controle externo.");
-                alert("O site deles bloqueia o clique externo. Você precisará clicar dentro do player.");
-            }
-        });
+        const workerBase = "https://delicate-feather-5576.futebolsemdelay.workers.dev/?url=";
+
+        function trocarCanal(urlOriginal) {
+            const iframe = document.getElementById('iframePlayer');
+            iframe.src = workerBase + encodeURIComponent(urlOriginal);
+        }
+
+        // Abre o primeiro canal automaticamente ao carregar a página
+        window.onload = () => trocarCanal('https://ww4.embedtv.lat/caze1');
     </script>
 </body>
 </html>
