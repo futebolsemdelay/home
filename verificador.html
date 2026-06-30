@@ -2,57 +2,63 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Auditoria de Canais - GitHub</title>
+    <title>Auditoria Completa de Canais</title>
     <style>
         body { font-family: sans-serif; padding: 20px; background: #f4f4f9; }
-        .box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .erro { color: #d32f2f; font-weight: bold; margin: 5px 0; padding: 5px; border-bottom: 1px solid #eee; }
-        .status-msg { margin-bottom: 20px; font-weight: bold; }
+        .box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 800px; margin: auto; }
+        .erro { color: #d32f2f; font-weight: bold; margin: 5px 0; border-bottom: 1px solid #eee; }
+        .ok { color: #388e3c; margin: 5px 0; border-bottom: 1px solid #eee; }
+        h2 { border-bottom: 2px solid #333; padding-bottom: 10px; }
     </style>
 </head>
 <body>
 
 <div class="box">
-    <h1>Verificando canais do GitHub...</h1>
-    <div id="status" class="status-msg">Carregando imagens.json...</div>
+    <h1>Auditoria de Canais</h1>
+    <div id="status">Carregando e processando...</div>
+    
+    <h2>✅ Canais OK</h2>
+    <div id="listaOk"></div>
+    
+    <h2>❌ Canais com Problemas</h2>
     <div id="listaErros"></div>
 </div>
 
 <script>
 async function rodarAuditoria() {
+    const listaOk = document.getElementById('listaOk');
     const listaErros = document.getElementById('listaErros');
     const statusDiv = document.getElementById('status');
 
     try {
-        // Carrega o JSON que está na mesma pasta
         const resposta = await fetch('imagens.json');
         const canais = await resposta.json();
         
         statusDiv.innerText = `Auditando ${canais.length} canais...`;
 
         for (const item of canais) {
+            // Regra aplicada conforme solicitado
             const urlFinal = item.qualidade === 'hd' ? item.logo + '/file.txt' : item.logo + '.m3u8';
             
             try {
-                // Tenta acessar com 'cors'. Se o servidor for estrito, ele vai falhar ou dar 403
                 const res = await fetch(urlFinal, { 
                     method: 'HEAD', 
                     mode: 'cors',
                     headers: { 'Referer': 'https://croudfront.lat/' } 
                 });
 
-                if (!res.ok) {
-                    // Aqui capturamos o 403 ou qualquer outro erro real
-                    listaErros.innerHTML += `<div class="erro">❌ [Erro ${res.status}] ${item.canal}</div>`;
+                if (res.ok) {
+                    listaOk.innerHTML += `<div class="ok">✅ [OK] ${item.canal} (${item.qualidade})</div>`;
+                } else {
+                    listaErros.innerHTML += `<div class="erro">❌ [Erro ${res.status}] ${item.canal} (${item.qualidade})</div>`;
                 }
             } catch (err) {
-                // Se o navegador bloquear via CORS, o erro cai aqui
-                listaErros.innerHTML += `<div class="erro">⚠️ [Bloqueado/CORS] ${item.canal}</div>`;
+                listaErros.innerHTML += `<div class="erro">⚠️ [Bloqueado/CORS] ${item.canal} (${item.qualidade})</div>`;
             }
         }
         statusDiv.innerText = "Auditoria finalizada.";
     } catch (e) {
-        statusDiv.innerHTML = `<span style="color:red">Erro ao carregar imagens.json: ${e.message}</span>`;
+        statusDiv.innerHTML = `<span style="color:red">Erro ao ler imagens.json: ${e.message}</span>`;
     }
 }
 
