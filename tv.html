@@ -128,7 +128,7 @@ font-size:22px;cursor:pointer;
 
         async function carregarCanaisJSON() {
             try {
-                const response = await fetch('imagens.json');
+                const response = await fetch('teste.json');
                 if (!response.ok) throw new Error('Falha');
                 canaisRaw=await response.json();
 const s=new Set(["Todos"]);
