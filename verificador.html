@@ -2,112 +2,82 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Auditor e Simulador de Canais</title>
+    <title>Auditoria Detalhada de Canais</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f4f4f9; }
-        .box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 1000px; margin: auto; }
-        .resumo-grid { display: flex; gap: 15px; margin-bottom: 20px; }
-        .card { padding: 15px; border-radius: 5px; flex: 1; text-align: center; font-weight: bold; }
-        .simulador { background: #e3f2fd; padding: 20px; border-radius: 5px; margin-top: 30px; border: 1px solid #90caf9; }
-        .linha-erro { color: #d32f2f; font-size: 0.85em; padding: 4px; border-bottom: 1px solid #eee; }
-        .linha-ok { color: #2e7d32; font-size: 0.85em; padding: 4px; border-bottom: 1px solid #eee; }
-        select { padding: 5px; margin-right: 10px; }
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f9; }
+        .box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 900px; margin: auto; }
+        .resumo { background: #e8f4fd; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .erro { color: #d32f2f; font-weight: bold; margin: 3px 0; border-bottom: 1px solid #eee; }
+        .ok { color: #388e3c; margin: 3px 0; border-bottom: 1px solid #eee; }
+        .count-box { display: inline-block; margin-right: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="box">
-    <h1>Auditoria Completa</h1>
-    <div id="resumo" class="resumo-grid">Processando auditoria...</div>
-
-    <div id="listaPrincipal">
-        <h2>Canais OFF</h2>
-        <div id="containerErros"></div>
-    </div>
-
-    <div class="simulador">
-        <h3>🚀 Teste de Substituição de Domínio</h3>
-        <p>Selecione um domínio que está com erro e tente substituí-lo por um que está OK:</p>
-        <select id="selectDe"></select>
-        <select id="selectPara"></select>
-        <button onclick="testarSubstituicao()" style="padding: 5px 15px; cursor: pointer;">Testar Substituição</button>
-        <div id="resultadoSimulacao" style="margin-top: 15px;"></div>
-    </div>
+    <h1>Auditoria de Canais</h1>
+    <div id="resumo" class="resumo">Processando contagem...</div>
+    
+    <h2>✅ Canais OK</h2>
+    <div id="listaOk"></div>
+    
+    <h2>❌ Canais com Problemas</h2>
+    <div id="listaErros"></div>
 </div>
 
 <script>
-let canaisGlobais = [];
-let dominiosErrados = new Set();
-let dominiosOk = new Set();
+async function rodarAuditoria() {
+    const listaOk = document.getElementById('listaOk');
+    const listaErros = document.getElementById('listaErros');
+    const resumoDiv = document.getElementById('resumo');
+    
+    let contagem = { ok: 0, erro: 0, dominiosErro: {} };
 
-async function iniciarTudo() {
     try {
-        const res = await fetch('imagens.json');
-        canaisGlobais = await res.json();
-        
-        const containerErros = document.getElementById('containerErros');
-        const resumoDiv = document.getElementById('resumo');
-        let cont = { total: canaisGlobais.length, ok: 0, erro: 0 };
+        const resposta = await fetch('imagens.json');
+        const canais = await resposta.json();
 
-        for (const item of canaisGlobais) {
+        for (const item of canais) {
             const urlFinal = item.qualidade === 'hd' ? item.logo + '/file.txt' : item.logo + '.m3u8';
-            const dom = new URL(item.logo).hostname;
+            
+            // Extrai o domínio da URL para o relatório
+            const dominio = new URL(item.logo).hostname;
 
             try {
-                const check = await fetch(urlFinal, { method: 'HEAD', mode: 'cors' });
-                if (check.ok) {
-                    cont.ok++;
-                    dominiosOk.add(dom);
+                const res = await fetch(urlFinal, { method: 'HEAD', mode: 'cors' });
+
+                if (res.ok) {
+                    contagem.ok++;
+                    listaOk.innerHTML += `<div class="ok">✅ [OK] ${item.canal}</div>`;
                 } else {
-                    throw new Error();
+                    registrarErro(item, `Erro ${res.status}`, dominio);
                 }
-            } catch(e) {
-                cont.erro++;
-                dominiosErrados.add(dom);
-                containerErros.innerHTML += `<div class="linha-erro">❌ ${item.canal} | <b>${dom}</b> | ${urlFinal}</div>`;
+            } catch (err) {
+                registrarErro(item, "Bloqueado/CORS", dominio);
             }
         }
 
-        resumoDiv.innerHTML = `
-            <div class="card" style="background:#ddd">Total: ${cont.total}</div>
-            <div class="card" style="background:#c8e6c9">OK: ${cont.ok}</div>
-            <div class="card" style="background:#ffcdd2">OFF: ${cont.erro}</div>
-        `;
-
-        // Popular selects
-        const sDe = document.getElementById('selectDe');
-        const sPara = document.getElementById('selectPara');
-        dominiosErrados.forEach(d => sDe.innerHTML += `<option value="${d}">${d}</option>`);
-        dominiosOk.forEach(d => sPara.innerHTML += `<option value="${d}">${d}</option>`);
-
-    } catch(e) {
-        document.body.innerHTML = "Erro ao carregar imagens.json. Certifique-se de estar usando um servidor local.";
-    }
-}
-
-async function testarSubstituicao() {
-    const de = document.getElementById('selectDe').value;
-    const para = document.getElementById('selectPara').value;
-    const resDiv = document.getElementById('resultadoSimulacao');
-    resDiv.innerHTML = "<b>Testando nova regra...</b>";
-
-    for (const item of canaisGlobais) {
-        const dom = new URL(item.logo).hostname;
-        if (dom === de) {
-            const novaUrl = (item.qualidade === 'hd' ? item.logo.replace(de, para) + '/file.txt' : item.logo.replace(de, para) + '.m3u8');
-            try {
-                const check = await fetch(novaUrl, { method: 'HEAD', mode: 'cors' });
-                resDiv.innerHTML += `<div class="${check.ok ? 'linha-ok' : 'linha-erro'}">
-                    ${check.ok ? '✅' : '❌'} ${item.canal}: ${novaUrl}
-                </div>`;
-            } catch(e) {
-                resDiv.innerHTML += `<div class="linha-erro">⚠️ Erro na tentativa: ${item.canal}</div>`;
-            }
+        // Exibe o Resumo Final
+        let htmlResumo = `<div class="count-box">Total OK: ${contagem.ok}</div>
+                          <div class="count-box" style="color:red">Total Erro: ${contagem.erro}</div><br><br>
+                          <strong>Erros por Domínio:</strong><ul>`;
+        for (const dom in contagem.dominiosErro) {
+            htmlResumo += `<li>${dom}: ${contagem.dominiosErro[dom]} erros</li>`;
         }
+        resumoDiv.innerHTML = htmlResumo + "</ul>";
+
+    } catch (e) {
+        resumoDiv.innerHTML = `<span style="color:red">Erro ao carregar JSON: ${e.message}</span>`;
+    }
+
+    function registrarErro(item, msg, dominio) {
+        contagem.erro++;
+        contagem.dominiosErro[dominio] = (contagem.dominiosErro[dominio] || 0) + 1;
+        listaErros.innerHTML += `<div class="erro">❌ [${msg}] ${item.canal} (${dominio})</div>`;
     }
 }
 
-iniciarTudo();
+rodarAuditoria();
 </script>
 </body>
 </html>
