@@ -182,7 +182,12 @@ function categoriaAnterior(){indiceCategoria=(indiceCategoria-1+categorias.lengt
             }, 5000);
 
             let urlVideo = c.logo;
-            if (c.qualidade === "hd") urlVideo += "/file.txt?m3u8";
+
+            if (c.qualidade === "hd") {
+            urlVideo += "/file.txt?m3u8";
+           } else if (c.qualidade === "sd") {
+           urlVideo += ".m3u8";
+           }
 
             isSmartBuffering = true;
             maxPercentReached = 0;
