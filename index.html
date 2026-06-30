@@ -135,7 +135,7 @@ const s=new Set(["Todos"]);
 canaisRaw.forEach(c=>{(c.categorias||[]).forEach(x=>{if(x!="Todos")s.add(x);});});
 categorias=[...s];
 renderList();
-            } catch (error) { document.getElementById('contentList').innerHTML = `<div class="item" style="color:red; text-align:center;">Erro ao carregar imagens.json</div>`; }
+            } catch (error) { document.getElementById('contentList').innerHTML = `<div class="item" style="color:red; text-align:center;">Erro ao Ler a Lista de Canais</div>`; }
         }
 
         function toggleFullScreen(){
