@@ -2,57 +2,80 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Verificador de Canais via JSON</title>
+    <title>Verificador de Canais - Auditoria</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; }
-        .ok { color: green; font-weight: bold; }
-        .erro { color: red; font-weight: bold; }
-        table { border-collapse: collapse; width: 100%; }
-        td, th { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #f4f4f9; }
+        .erro-box { background: #fee; border: 2px solid #f00; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
+        .erro-item { color: #d00; margin: 5px 0; font-weight: bold; }
+        table { border-collapse: collapse; width: 100%; background: #fff; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #333; color: #fff; }
+        .status-ok { color: green; }
+        .status-erro { color: red; }
     </style>
 </head>
 <body>
 
-<h1>Status dos Canais (Carregado de imagens.json)</h1>
-<table id="tabela">
-    <tr><th>Canal</th><th>Qualidade</th><th>URL Final</th><th>Status</th></tr>
-</table>
+    <h1>Auditoria de Canais</h1>
+    <div id="relatorioErros" class="erro-box">
+        <h3>🚨 Canais Inacessíveis:</h3>
+        <div id="listaErros">Nenhum erro encontrado até o momento...</div>
+    </div>
+
+    <table id="tabelaCanais">
+        <thead>
+            <tr>
+                <th>Canal</th>
+                <th>Qualidade</th>
+                <th>URL Final</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 
 <script>
-async function carregarEVerificar() {
+async function iniciarVerificacao() {
+    const tabelaBody = document.querySelector("#tabelaCanais tbody");
+    const listaErros = document.querySelector("#listaErros");
+    let encontrouErro = false;
+
     try {
-        // Busca o arquivo JSON na mesma pasta
         const resposta = await fetch('imagens.json');
         const canais = await resposta.json();
-        
-        const tabela = document.getElementById('tabela');
 
         canais.forEach(item => {
-            // Regra: /file.txt para hd, .m3u8 para sd
             const urlFinal = item.qualidade === 'hd' ? item.logo + '/file.txt' : item.logo + '.m3u8';
             
-            const row = tabela.insertRow();
-            row.insertCell(0).innerText = item.canal;
-            row.insertCell(1).innerText = item.qualidade;
-            row.insertCell(2).innerText = urlFinal;
-            const cellStatus = row.insertCell(3);
-            cellStatus.innerText = "Verificando...";
+            // Adiciona na tabela
+            const row = tabelaBody.insertRow();
+            row.innerHTML = `<td>${item.canal}</td><td>${item.qualidade}</td><td>${urlFinal}</td><td class="status">Testando...</td>`;
+            const statusCell = row.querySelector('.status');
 
-            // Verificação via HEAD request
+            // Testa a URL
             fetch(urlFinal, { method: 'HEAD', mode: 'no-cors' })
                 .then(() => {
-                    cellStatus.innerHTML = '<span class="ok">OK</span>';
+                    statusCell.innerText = "OK";
+                    statusCell.className = "status-ok";
                 })
                 .catch(() => {
-                    cellStatus.innerHTML = '<span class="erro">Erro</span>';
+                    statusCell.innerText = "FORA DO AR";
+                    statusCell.className = "status-erro";
+                    
+                    // Adiciona ao relatório de erros
+                    if (!encontrouErro) { listaErros.innerHTML = ""; encontrouErro = true; }
+                    const divErro = document.createElement('div');
+                    divErro.className = "erro-item";
+                    divErro.innerHTML = `❌ ${item.canal} (${item.qualidade}) - <a href="${urlFinal}" target="_blank">Abrir link</a>`;
+                    listaErros.appendChild(divErro);
                 });
         });
-    } catch (e) {
-        document.body.innerHTML += '<p style="color:red">Erro: Não foi possível carregar o arquivo imagens.json. Certifique-se de estar rodando em um servidor local.</p>';
+    } catch (err) {
+        listaErros.innerHTML = "Erro ao carregar o arquivo JSON. Certifique-se de usar um servidor local (Live Server).";
     }
 }
 
-carregarEVerificar();
+iniciarVerificacao();
 </script>
 </body>
 </html>
