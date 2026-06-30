@@ -181,13 +181,21 @@ function categoriaAnterior(){indiceCategoria=(indiceCategoria-1+categorias.lengt
                 setTimeout(() => { bar.style.display = "none"; }, 1000);
             }, 5000);
 
+            // Define o prefixo do seu Worker
+            const workerPrefix = "https://delicate-feather-5576.futebolsemdelay.workers.dev/?url=";
+            
             let urlVideo = c.logo;
 
             if (c.qualidade === "hd") {
-            urlVideo += "/file.txt?m3u8";
-           } else if (c.qualidade === "sd") {
-           urlVideo += ".m3u8";
-           }
+                // Qualidade HD: Worker na frente, NADA no final
+                urlVideo = workerPrefix + encodeURIComponent(c.logo);
+            } else if (c.qualidade === "sd") {
+                // Qualidade SD: NADA na frente, adiciona .m3u8 no final
+                urlVideo = c.logo + ".m3u8";
+            } else {
+                // Caso padrão (se não for nem hd nem sd), apenas usa o logo
+                urlVideo = c.logo;
+            }
 
             isSmartBuffering = true;
             maxPercentReached = 0;
